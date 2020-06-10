@@ -1,0 +1,10 @@
+{
+  "id": "carpet",
+  "name": "RiftedCarpet",
+  "authors": [
+    "Kahzerx"
+  ],
+  "listeners": [
+    "carpet.Loader"
+  ]
+}

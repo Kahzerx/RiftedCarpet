@@ -1,0 +1,55 @@
+
+buildscript {
+    repositories {
+        jcenter()
+        maven { url 'http://files.minecraftforge.net/maven' }
+        maven { url 'http://repo.spongepowered.org/maven' }
+//        maven { url 'https://www.jitpack.io' }
+        maven { url "$projectDir/rift_libs" }
+    }
+
+    dependencies {
+        classpath 'com.github.Chocohead:ForgeGradle:jitpack-SNAPSHOT'
+        classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
+    }
+}
+
+apply plugin: 'net.minecraftforge.gradle.tweaker-client'
+apply plugin: 'org.spongepowered.mixin'
+apply plugin: 'java'
+
+group 'carpet'
+version '0.9.0'
+archivesBaseName = 'carpetmod'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+//    maven { url 'https://www.dimdev.org/maven/' }
+    maven { url 'https://repo.spongepowered.org/maven/' }
+//    maven { url 'https://www.jitpack.io' }
+    maven { url "$projectDir/rift_libs" }
+    //maven { url "http://repo.strezz.org/artifactory/list/Strezz-Central" }
+}
+
+dependencies {
+    //implementation 'com.github.Chocohead:Rift:f76cf44d887d290782590c99770876393c924333:dev'
+    //implementation 'com.github.Chocohead:Rift:2d8bb9bd5620ac10307c17b2f38c4dfc21e11216:dev'
+    //implementation 'com.github.Chocohead:Rift:c283efe7bdf6436cdd8710b563ff05793aeca20d:dev'
+    //implementation 'com.github.Chocohead:Rift:jitpack-SNAPSHOT:dev'
+    implementation 'com.github.Chocohead:Rift:jitpack-aeee80c1fb-1:dev'
+}
+
+mixin {
+    defaultObfuscationEnv notch
+    add sourceSets.main, 'mixins.carpet.refmap.json'
+}
+
+minecraft {
+    version = '1.13.2'
+    mappings = 'snapshot_20181130'
+    runDir = 'run'
+    tweakClass = 'org.dimdev.riftloader.launch.RiftLoaderTweaker'
+}

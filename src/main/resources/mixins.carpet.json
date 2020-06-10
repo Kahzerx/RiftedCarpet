@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.7.7",
+  "package": "carpet.mixins",
+  "refmap": "mixins.carpet.refmap.json",
+  "target": "@env(DEFAULT)",
+  "mixins": [],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
