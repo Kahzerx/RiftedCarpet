@@ -4,7 +4,10 @@
   "package": "carpet.mixins",
   "refmap": "mixins.carpet.refmap.json",
   "target": "@env(DEFAULT)",
-  "mixins": [],
+  "mixins": [
+    "MinecraftServer_coreMixin",
+    "MinecraftClientMixin"
+  ],
   "client": [],
   "injectors": {
     "defaultRequire": 1
