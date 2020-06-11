@@ -5,8 +5,8 @@
   "refmap": "mixins.carpet.refmap.json",
   "target": "@env(DEFAULT)",
   "mixins": [
-    "MinecraftServer_coreMixin",
-    "MinecraftClientMixin"
+    "ClientMixin",
+    "IntegratedServerMixin"
   ],
   "client": [],
   "injectors": {
