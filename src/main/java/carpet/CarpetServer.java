@@ -20,13 +20,11 @@ public class CarpetServer {
     public static void onServerLoaded(MinecraftServer server){
         System.out.println("o/");
         CarpetServer.minecraft_server = server;
-    }
-
-    public static void tick(MinecraftServer server){
-
-    }
-
-    public static void onServerClosed(MinecraftServer server){
-
+        settingsManager.attachServer(server);
+        extensions.forEach(e -> {
+            SettingsManager sm = e.customSettingsManager();
+            if (sm != null) sm.attachServer(server);
+            e.onServerClosed(server);
+        });
     }
 }

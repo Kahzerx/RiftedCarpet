@@ -3,8 +3,9 @@ package carpet;
 import carpet.settings.SettingsManager;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.command.CommandSource;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
+
+import java.util.Map;
 
 public interface CarpetExtension {
     /**
@@ -35,19 +36,11 @@ public interface CarpetExtension {
      */
     default SettingsManager customSettingsManager() {return null;}
 
-    /**
-     * todiddalidoo
-     */
-    default void onPlayerLoggedIn(EntityPlayerMP player) {}
-
-    /**
-     * todiddalidoo
-     */
-    default void onPlayerLoggedOut(EntityPlayerMP player) {}
-
     default void onServerClosed(MinecraftServer server) {}
 
     default String version() {return null;}
 
     default void registerLoggers() {}
+
+    default Map<String, String> canHasTranslations(String lang) { return null;}
 }

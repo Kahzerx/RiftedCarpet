@@ -3,7 +3,6 @@ package carpet.utils;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
@@ -275,9 +274,6 @@ public class Messenger
         return message;
     }
 
-
-
-
     public static void send(EntityPlayer player, Collection<ITextComponent> lines)
     {
         lines.forEach(player::sendMessage);
@@ -285,28 +281,5 @@ public class Messenger
     public static void send(CommandSource source, Collection<ITextComponent> lines)
     {
         lines.stream().forEachOrdered((s) -> source.sendFeedback(s, false));
-    }
-
-
-    public static void print_server_message(MinecraftServer server, String message)
-    {
-        if (server == null)
-            LOG.error("Message not delivered: "+message);
-        server.sendMessage(new TextComponentString(message));
-        ITextComponent txt = c("gi "+message);
-        for (EntityPlayer entityplayer : server.getPlayerList().getPlayers())
-        {
-            entityplayer.sendMessage(txt);
-        }
-    }
-    public static void print_server_message(MinecraftServer server, ITextComponent message)
-    {
-        if (server == null)
-            LOG.error("Message not delivered: "+message.getString());
-        server.sendMessage(message);
-        for (EntityPlayer entityplayer : server.getPlayerList().getPlayers())
-        {
-            entityplayer.sendMessage(message);
-        }
     }
 }
