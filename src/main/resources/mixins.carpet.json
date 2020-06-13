@@ -6,7 +6,13 @@
   "target": "@env(DEFAULT)",
   "mixins": [
     "ClientMixin",
-    "IntegratedServerMixin"
+    "IntegratedServerMixin",
+    "CarpetCommandManagerMixin",
+    "MinecraftServer_coreMixin",
+    "Entity_portalSuffocationMixin",
+    "EntityPlayer_portalDelayMixin",
+    "ContainerMixin",
+    "EntityPlayer_parrotMixin"
   ],
   "client": [],
   "injectors": {
