@@ -45,9 +45,6 @@ public class Teleporter_portalSuffocationMixin {
         else {
             this.d5 = d2 + offset;
         }
-        System.out.println(this.d5);
-        System.out.println(this.d7);
-
     }
 
     @Redirect(method = "placeInExistingPortal", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;setLocationAndAngles(DDDFF)V"))
