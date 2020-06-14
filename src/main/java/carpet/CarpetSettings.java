@@ -89,6 +89,19 @@ public class CarpetSettings {
     public static boolean combineXPOrbs = false;
 
     @Rule(
+            desc = "Empty shulker boxes can stack to 64 when dropped on the ground",
+            extra = "To move them around between inventories, use shift click to move entire stacks",
+            category = {SURVIVAL, FEATURE}
+    )
+    public static boolean stackableShulkerBoxes = false;
+
+    @Rule( desc = "Explosions won't destroy blocks", category = {CREATIVE, TNT} )
+    public static boolean explosionNoBlockDamage = false;
+
+    @Rule( desc = "Removes random TNT momentum when primed", category = {CREATIVE, TNT} )
+    public static boolean tntPrimerMomentumRemoved = false;
+
+    @Rule(
             desc = "Enables /c and /s commands to quickly switch between camera and survival modes",
             extra = "/c and /s commands are available to all players regardless of their permission levels",
             category = COMMAND

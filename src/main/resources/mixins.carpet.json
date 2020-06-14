@@ -11,7 +11,11 @@
     "EntityPlayer_portalDelayMixin",
     "ContainerMixin",
     "EntityPlayer_parrotMixin",
-    "EntityXPOrbMixin"
+    "EntityXPOrbMixin",
+    "Teleporter_portalSuffocationMixin",
+    "EntityItemMixin",
+    "ExplosionMixin",
+    "EntityTntMixin"
   ],
   "client": [
     "ClientMixin",
