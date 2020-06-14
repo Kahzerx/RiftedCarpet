@@ -82,6 +82,12 @@ public class CarpetSettings {
     @Rule(desc = "Parrots don't get of your shoulders until you receive proper damage", category = {SURVIVAL, FEATURE})
     public static boolean persistentParrots = false;
 
+    @Rule( desc = "Players absorb XP instantly, without delay", category = CREATIVE )
+    public static boolean xpNoCooldown = false;
+
+    @Rule( desc = "XP orbs combine with other into bigger orbs", category = FEATURE )
+    public static boolean combineXPOrbs = false;
+
     @Rule(
             desc = "Enables /c and /s commands to quickly switch between camera and survival modes",
             extra = "/c and /s commands are available to all players regardless of their permission levels",

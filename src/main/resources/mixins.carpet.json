@@ -5,16 +5,18 @@
   "refmap": "mixins.carpet.refmap.json",
   "target": "@env(DEFAULT)",
   "mixins": [
-    "ClientMixin",
-    "IntegratedServerMixin",
     "CarpetCommandManagerMixin",
     "MinecraftServer_coreMixin",
     "Entity_portalSuffocationMixin",
     "EntityPlayer_portalDelayMixin",
     "ContainerMixin",
-    "EntityPlayer_parrotMixin"
+    "EntityPlayer_parrotMixin",
+    "EntityXPOrbMixin"
   ],
-  "client": [],
+  "client": [
+    "ClientMixin",
+    "IntegratedServerMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }
