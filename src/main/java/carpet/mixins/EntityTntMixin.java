@@ -25,4 +25,9 @@ public abstract class EntityTntMixin extends Entity implements EntityTntInterfac
             this.motionZ = 0.0;
         }
     }
+
+    @Inject(method = "<init>(Lnet/minecraft/world/World;DDDLnet/minecraft/entity/EntityLivingBase;)V", at = @At(value = "RETURN"))
+    private void modifyTNTAngle(World worldIn, double x, double y, double z, EntityLivingBase igniter, CallbackInfo ci){
+        if (CarpetSettings.hardcodeTNTangle != -1.0D) setVelocity(-Math.sin(CarpetSettings.hardcodeTNTangle) * 0.02, 0.2, -Math.cos(CarpetSettings.hardcodeTNTangle) * 0.02);
+    }
 }

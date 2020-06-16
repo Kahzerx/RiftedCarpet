@@ -101,6 +101,22 @@ public class CarpetSettings {
     @Rule( desc = "Removes random TNT momentum when primed", category = {CREATIVE, TNT} )
     public static boolean tntPrimerMomentumRemoved = false;
 
+    @Rule( desc = "Sets the horizontal random angle on TNT for debugging of TNT contraptions", category = TNT, options = "-1", strict = false,
+            validate = TNTAngleValidator.class, extra = "Set to -1 for default behavior")
+    public static double hardcodeTNTangle = -1.0D;
+
+    private static class TNTAngleValidator extends Validator<Double> {
+        @Override
+        public Double validate(CommandSource source, ParsedRule<Double> currentRule, Double newValue, String string) {
+            return (newValue >= 0 && newValue < Math.PI * 2) || newValue == -1 ? newValue : null;
+        }
+
+        @Override
+        public String description() {
+            return "Must be between 0 and 2pi, or -1";
+        }
+    }
+
     @Rule(
             desc = "Enables /c and /s commands to quickly switch between camera and survival modes",
             extra = "/c and /s commands are available to all players regardless of their permission levels",
