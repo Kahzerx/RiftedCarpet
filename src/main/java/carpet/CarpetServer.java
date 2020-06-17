@@ -1,6 +1,7 @@
 package carpet;
 
 import carpet.commands.CameraModeCommand;
+import carpet.commands.CounterCommand;
 import carpet.settings.SettingsManager;
 import carpet.utils.MobAI;
 import com.mojang.brigadier.CommandDispatcher;
@@ -44,6 +45,7 @@ public class CarpetServer {
 
     public static void registerCarpetCommands(CommandDispatcher<CommandSource> dispatcher){
         CameraModeCommand.register(dispatcher);
+        CounterCommand.register(dispatcher);
 
         extensions.forEach(e -> e.registerCommands(dispatcher));
         currentCommandDispatcher = dispatcher;

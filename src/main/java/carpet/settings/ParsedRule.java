@@ -23,6 +23,7 @@ public final class ParsedRule<T> implements Comparable<ParsedRule> {
     public final ImmutableList<String> categories;
     public final ImmutableList<String> options;
     public boolean isStrict;
+    public boolean isClient;
     public final Class<T> type;
     public final List<Validator<T>> validators;
     public final T defaultValue;
@@ -48,6 +49,11 @@ public final class ParsedRule<T> implements Comparable<ParsedRule> {
                 this.isStrict = false;
                 this.validators.add((Validator<T>) callConstructor(Validator._COMMAND_LEVEL_VALIDATOR.class));
             }
+        }
+        this.isClient = categories.contains(RuleCategory.CLIENT);
+        if (this.isClient)
+        {
+            this.validators.add(callConstructor(Validator._CLIENT.class));
         }
 
         this.defaultValue = get();

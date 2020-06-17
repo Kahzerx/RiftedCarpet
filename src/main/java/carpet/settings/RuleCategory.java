@@ -7,4 +7,5 @@ public class RuleCategory {
     public static final String CREATIVE = "creative";
     public static final String SURVIVAL = "survival";
     public static final String TNT = "tnt";
+    public static final String CLIENT = "client";
 }

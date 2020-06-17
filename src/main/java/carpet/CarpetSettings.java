@@ -117,9 +117,47 @@ public class CarpetSettings {
         }
     }
 
+    @Rule( desc = "Shulkers will respawn in end cities", category = FEATURE )
+    public static boolean shulkerSpawningInEndCities = false;
+
+    @Rule( desc = "TNT doesn't update when placed against a power source", category = {CREATIVE, TNT} )
+    public static boolean tntDoNotUpdate = false;
+
+    @Rule(desc = "Pistons, droppers and dispensers react if block above them is powered", category = CREATIVE)
+    public static boolean quasiConnectivity = true;
+
+    @Rule(
+            desc = "Players can flip and rotate blocks when holding cactus",
+            extra = {
+                    "Applies to pistons, observers, droppers, repeaters, stairs, glazed terracotta etc..."
+            },
+            category = {CREATIVE, SURVIVAL, FEATURE}
+    )
+    public static boolean flippinCactus = false;
+
+    @Rule(
+            desc = "hoppers pointing to wool will count items passing through them",
+            extra = {
+                    "Enables /counter command, and actions while placing red and green carpets on wool blocks",
+                    "Use /counter <color?> reset to reset the counter, and /counter <color?> to query",
+                    "In survival, place green carpet on same color wool to query, red to reset the counters",
+                    "Counters are global and shared between players, 16 channels available",
+                    "Items counted are destroyed, count up to one stack per tick per hopper",
+                    "You may need to setDefault true/false, exit and join the world for /counter to appear or not in command list"
+            },
+            category = {COMMAND, CREATIVE, FEATURE}
+    )
+    public static boolean hopperCounters = false;
+
+    @Rule( desc = "Saplings turn into dead shrubs in hot climates and no water access", category = FEATURE )
+    public static boolean desertShrubs = false;
+
     @Rule(
             desc = "Enables /c and /s commands to quickly switch between camera and survival modes",
-            extra = "/c and /s commands are available to all players regardless of their permission levels",
+            extra = {
+                    "/c and /s commands are available to all players regardless of their permission levels",
+                    "You may need to setDefault true/false, exit and join the world for /c - /s to appear or not in command list"
+            },
             category = COMMAND
     )
     public static String commandCameramode = "true";

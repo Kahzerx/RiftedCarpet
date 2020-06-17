@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EntityXPOrb.class)
-public class EntityXPOrbMixin implements XPOrbInterface {
+public abstract class EntityXPOrbMixin implements XPOrbInterface {
     @Shadow private int xpValue;
     public int combineDelay = 50;
     public int getCombineDelay() { return combineDelay; }
