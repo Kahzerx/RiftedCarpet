@@ -149,8 +149,25 @@ public class CarpetSettings {
     )
     public static boolean hopperCounters = false;
 
+    @Rule( desc = "Guardians turn into Elder Guardian when struck by lightning", category = FEATURE )
+    public static boolean renewableSponges = false;
+
     @Rule( desc = "Saplings turn into dead shrubs in hot climates and no water access", category = FEATURE )
     public static boolean desertShrubs = false;
+
+    @Rule( desc = "Silverfish drop a gravel item when breaking out of a block", category = FEATURE )
+    public static boolean silverFishDropGravel = false;
+
+    @Rule( desc = "summoning a lightning bolt has all the side effects of natural lightning", category = CREATIVE )
+    public static boolean summonNaturalLightning = false;
+
+    @Rule(desc = "Placing carpets may issue carpet commands for non-op players", category = SURVIVAL)
+    public static boolean carpets = false;
+
+    @Rule(desc = "Enables /spawn command for spawn tracking",
+            extra = "You may need to setDefault true/false, exit and join the world for /counter to appear or not in command list",
+            category = COMMAND)
+    public static String commandSpawn = "true";
 
     @Rule(
             desc = "Enables /c and /s commands to quickly switch between camera and survival modes",

@@ -5,16 +5,19 @@
   "refmap": "mixins.carpet.refmap.json",
   "target": "@env(DEFAULT)",
   "mixins": [
+    "BlockCarpetMixin",
     "BlockDispenserQCMixin",
     "BlockHopperCactusMixin",
     "BlockPistonQCMixin",
     "BlockSaplingMixin",
+    "BlockSilverfishMixin",
     "BlockTntMixin",
     "CarpetCommandManagerMixin",
     "ChunkGeneratorEndMixin",
     "ContainerMixin",
     "EndCityStructureMixin",
     "Entity_portalSuffocationMixin",
+    "EntityGuardianMixin",
     "EntityItemMixin",
     "EntityPlayer_parrotMixin",
     "EntityPlayer_portalDelayMixin",
@@ -26,8 +29,10 @@
     "ItemUseContextCactusMixin",
     "MinecraftServer_coreMixin",
     "PlayerInteractionManagerMixin",
+    "SummonCommandMixin",
     "Teleporter_portalSuffocationMixin",
-    "TileEntityHopperMixin"
+    "TileEntityHopperMixin",
+    "WeightedRandomMixin"
   ],
   "client": [
     "ClientMixin",
