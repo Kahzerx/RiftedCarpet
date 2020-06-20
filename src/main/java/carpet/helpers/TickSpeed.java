@@ -37,8 +37,7 @@ public class TickSpeed {
         player_active_timeout = PLAYER_GRACE+ticks;
     }
 
-    public static void tickrate(float rate)
-    {
+    public static void tickrate(float rate)    {
         tickrate = rate;
         mspt = (long)(1000.0/tickrate);
         if (mspt <=0)
@@ -162,7 +161,5 @@ public class TickSpeed {
 
             }
         }
-
-
     }
 }

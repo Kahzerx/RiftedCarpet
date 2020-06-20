@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
 import static carpet.settings.RuleCategory.*;
 
 public class CarpetSettings {
-    public static final String carpetVersion = "1.0.0+v00001";
+    public static final String carpetVersion = "0.7.3+v190620";
     public static final Logger LOG = LogManager.getLogger();
     public static boolean impendingFillSkipUpdates = false;
     public static AxisAlignedBB currentTelepotingEntityBox = null;
@@ -136,7 +136,7 @@ public class CarpetSettings {
     public static boolean flippinCactus = false;
 
     @Rule(
-            desc = "hoppers pointing to wool will count items passing through them",
+            desc = "Hoppers pointing to wool will count items passing through them",
             extra = {
                     "Enables /counter command, and actions while placing red and green carpets on wool blocks",
                     "Use /counter <color?> reset to reset the counter, and /counter <color?> to query",
@@ -158,16 +158,13 @@ public class CarpetSettings {
     @Rule( desc = "Silverfish drop a gravel item when breaking out of a block", category = FEATURE )
     public static boolean silverFishDropGravel = false;
 
-    @Rule( desc = "summoning a lightning bolt has all the side effects of natural lightning", category = CREATIVE )
+    @Rule( desc = "Summoning a lightning bolt has all the side effects of natural lightning", category = CREATIVE )
     public static boolean summonNaturalLightning = false;
-
-    @Rule(desc = "Placing carpets may issue carpet commands for non-op players", category = SURVIVAL)
-    public static boolean carpets = false;
 
     @Rule(desc = "Enables /spawn command for spawn tracking",
             extra = "You may need to setDefault true/false, exit and join the world for /counter to appear or not in command list",
             category = COMMAND)
-    public static String commandSpawn = "true";
+    public static String commandSpawn = "false";
 
     @Rule(
             desc = "Enables /c and /s commands to quickly switch between camera and survival modes",
@@ -178,4 +175,70 @@ public class CarpetSettings {
             category = COMMAND
     )
     public static String commandCameramode = "true";
+
+    @Rule(desc = "Placing carpets may issue carpet commands for non-op players", category = SURVIVAL)
+    public static boolean carpets = false;
+
+    @Rule(desc = "Pistons, Glass and Sponge can be broken faster with their appropriate tools", category = SURVIVAL)
+    public static boolean missingTools = false;
+
+    private static class PushLimitLimits extends Validator<Integer> {
+        @Override public Integer validate(CommandSource source, ParsedRule<Integer> currentRule, Integer newValue, String string) {
+            return (newValue>0 && newValue <= 1024) ? newValue : null;
+        }
+        @Override
+        public String description() { return "You must choose a value from 1 to 1024";}
+    }
+    @Rule(
+            desc = "Customizable piston push limit",
+            options = {"10", "12", "14", "100"},
+            category = CREATIVE,
+            strict = false,
+            validate = PushLimitLimits.class
+    )
+    public static int pushLimit = 12;
+
+    @Rule(
+            desc = "Customizable powered rail power range",
+            options = {"9", "15", "30"},
+            category = CREATIVE,
+            strict = false,
+            validate = PushLimitLimits.class
+    )
+    public static int railPowerLimit = 9;
+
+    private static class FillLimitLimits extends Validator<Integer> {
+        @Override public Integer validate(CommandSource source, ParsedRule<Integer> currentRule, Integer newValue, String string) {
+            return (newValue>0 && newValue < 20000000) ? newValue : null;
+        }
+        @Override
+        public String description() { return "You must choose a value from 1 to 20M";}
+    }
+    @Rule(
+            desc = "Customizable fill/clone volume limit",
+            options = {"32768", "250000", "1000000"},
+            category = CREATIVE,
+            strict = false,
+            validate = FillLimitLimits.class
+    )
+    public static int fillLimit = 32768;
+
+    @Rule(
+            desc = "Customizable forceload chunk limit",
+            options = {"256"},
+            category = CREATIVE,
+            strict = false,
+            validate = FillLimitLimits.class
+    )
+    public static int forceloadLimit = 256;
+
+    @Rule(desc = "Coral structures will grow with bonemeal from coral plants", category = FEATURE)
+    public static boolean renewableCoral = false;
+
+    @Rule(
+            desc = "Removes fog from client in the nether and the end",
+            extra = "Improves visibility, but looks weird",
+            category = CLIENT
+    )
+    public static boolean fogOff = false;
 }
