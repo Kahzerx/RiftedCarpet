@@ -39,14 +39,19 @@ public class WoolTool {
             return;
         }
         switch (color){
+            case PINK:
+                if (!"false".equals(CarpetSettings.commandSpawn)) Messenger.send(placer, SpawnReporter.report(pos, worldIn));
+                break;
+            case BLACK:
+                if (!"false".equals(CarpetSettings.commandSpawn)) Messenger.send(placer, SpawnReporter.show_mobcaps(pos, worldIn));
+                break;
             case GREEN:
                 if (CarpetSettings.hopperCounters)
                 {
                     EnumDyeColor under = getWoolColorAtPosition(worldIn, pos.down());
                     if (under == null) return;
                     HopperCounter counter = HopperCounter.getCounter(under.toString());
-                    if (counter != null)
-                        Messenger.send(placer, counter.format(worldIn.getServer(), false, false));
+                    if (counter != null) Messenger.send(placer, counter.format(worldIn.getServer(), false, false));
                 }
                 break;
             case RED:

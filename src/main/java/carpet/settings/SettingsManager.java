@@ -14,6 +14,7 @@ import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.ITextComponent;
 import org.apache.commons.lang3.tuple.Pair;
@@ -72,6 +73,7 @@ public class SettingsManager
         this.server = server;
         loadConfigurationFromConf();
         registerCommand(server.getCommandManager().getDispatcher());
+        notifyPlayersCommandsChanged();
     }
 
     private void loadConfigurationFromConf(){
@@ -140,6 +142,11 @@ public class SettingsManager
             if (rule.type == boolean.class) ((ParsedRule<Boolean>) rule).set(server.getCommandSource(), false, "false");
             if (rule.type == String.class && rule.options.contains("false"))((ParsedRule<String>) rule).set(server.getCommandSource(), "false", "false");
         }
+    }
+
+    public void notifyPlayersCommandsChanged(){
+        if (server.getPlayerList() == null) return;
+        for (EntityPlayerMP entityPlayerMP : server.getPlayerList().getPlayers()) server.getCommandManager().send(entityPlayerMP);
     }
 
     private void registerCommand(CommandDispatcher<CommandSource> dispatcher){

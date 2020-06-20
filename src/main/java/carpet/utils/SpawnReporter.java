@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import carpet.mixins.WeightedRandomMixin;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.registry.IRegistry;
 import net.minecraft.util.text.ITextComponent;
