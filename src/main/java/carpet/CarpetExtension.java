@@ -3,6 +3,7 @@ package carpet;
 import carpet.settings.SettingsManager;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.command.CommandSource;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 
 import java.util.Map;
@@ -43,4 +44,14 @@ public interface CarpetExtension {
     default void registerLoggers() {}
 
     default Map<String, String> canHasTranslations(String lang) { return null;}
+
+    /**
+     * todiddalidoo
+     */
+    default void onPlayerLoggedIn(EntityPlayerMP player) {}
+
+    /**
+     * todiddalidoo
+     */
+    default void onPlayerLoggedOut(EntityPlayerMP player) {}
 }

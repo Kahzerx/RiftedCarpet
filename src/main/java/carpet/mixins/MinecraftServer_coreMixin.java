@@ -16,4 +16,9 @@ public abstract class MinecraftServer_coreMixin {
         CarpetServer.tick((MinecraftServer) (Object) this);
     }
 
+    @Inject(method = "stopServer", at = @At("RETURN"))
+    private void serverClosed(CallbackInfo ci){
+        CarpetServer.onServerClosed((MinecraftServer)(Object) this);
+    }
+
 }

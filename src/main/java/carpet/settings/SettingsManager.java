@@ -69,6 +69,11 @@ public class SettingsManager
         }
     }
 
+    public void detachServer() {
+        for (ParsedRule<?> rule : rules.values()) rule.resetToDefault(null);
+        server = null;
+    }
+
     public void attachServer(MinecraftServer server){
         this.server = server;
         loadConfigurationFromConf();

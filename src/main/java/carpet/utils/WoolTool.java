@@ -5,9 +5,11 @@ import carpet.helpers.HopperCounter;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.command.CommandSource;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -44,6 +46,18 @@ public class WoolTool {
                 break;
             case BLACK:
                 if (!"false".equals(CarpetSettings.commandSpawn)) Messenger.send(placer, SpawnReporter.show_mobcaps(pos, worldIn));
+                break;
+            case BROWN:
+                if (!"false".equals(CarpetSettings.commandDistance))
+                {
+                    CommandSource source = placer.getCommandSource();
+                    if (!DistanceCalculator.hasStartingPoint(source) || placer.isSneaking()) {
+                        DistanceCalculator.setStart(source, new Vec3d(pos));
+                    }
+                    else {
+                        DistanceCalculator.setEnd(source, new Vec3d(pos));
+                    }
+                }
                 break;
             case GREEN:
                 if (CarpetSettings.hopperCounters)

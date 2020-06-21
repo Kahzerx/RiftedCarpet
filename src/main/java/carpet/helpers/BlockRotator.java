@@ -20,7 +20,10 @@ public class BlockRotator {
         if (!playerIn.abilities.allowEdit || !CarpetSettings.flippinCactus || !player_holds_cactus_mainhand(playerIn)){
             return false;
         }
-        return flip_block(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
+        CarpetSettings.impendingFillSkipUpdates = true;
+        boolean retval = flip_block(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
+        CarpetSettings.impendingFillSkipUpdates = false;
+        return retval;
     }
     public static boolean flip_block(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         Block block = state.getBlock();
