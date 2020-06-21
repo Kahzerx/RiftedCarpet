@@ -14,11 +14,7 @@ import org.apache.logging.log4j.Logger;
 import static carpet.settings.RuleCategory.*;
 
 public class CarpetSettings {
-<<<<<<< HEAD
     public static final String carpetVersion = "0.7.8+v200620";
-=======
-    public static final String carpetVersion = "0.7.3+v190620";
->>>>>>> master
     public static final Logger LOG = LogManager.getLogger();
     public static boolean impendingFillSkipUpdates = false;
     public static AxisAlignedBB currentTelepotingEntityBox = null;
@@ -169,7 +165,6 @@ public class CarpetSettings {
             extra = "You may need to setDefault true/false, exit and join the world for /counter to appear or not in command list",
             category = COMMAND)
     public static String commandSpawn = "false";
-<<<<<<< HEAD
 
     @Rule(desc = "Enables /log command to monitor events via chat and overlays", category = COMMAND)
     public static String commandLog = "true";
@@ -180,8 +175,6 @@ public class CarpetSettings {
             category = COMMAND
     )
     public static String commandDistance = "true";
-=======
->>>>>>> master
 
     @Rule(
             desc = "Enables /c and /s commands to quickly switch between camera and survival modes",
@@ -193,24 +186,18 @@ public class CarpetSettings {
     )
     public static String commandCameramode = "true";
 
-<<<<<<< HEAD
     @Rule(desc = "Enables /draw commands", extra = {"... allows for drawing simple shapes or","other shapes which are sorta difficult to do normally"}, category = COMMAND)
     public static String commandDraw = "true";
 
-=======
->>>>>>> master
     @Rule(desc = "Placing carpets may issue carpet commands for non-op players", category = SURVIVAL)
     public static boolean carpets = false;
 
     @Rule(desc = "Pistons, Glass and Sponge can be broken faster with their appropriate tools", category = SURVIVAL)
     public static boolean missingTools = false;
 
-<<<<<<< HEAD
     @Rule(desc = "fill/clone/setblock and structure blocks cause block updates", category = CREATIVE)
     public static boolean fillUpdates = true;
 
-=======
->>>>>>> master
     private static class PushLimitLimits extends Validator<Integer> {
         @Override public Integer validate(CommandSource source, ParsedRule<Integer> currentRule, Integer newValue, String string) {
             return (newValue>0 && newValue <= 1024) ? newValue : null;
