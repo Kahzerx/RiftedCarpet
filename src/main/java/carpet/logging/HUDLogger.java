@@ -1,5 +1,9 @@
 package carpet.logging;
 
+import carpet.utils.HUDController;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.text.ITextComponent;
+
 import java.lang.reflect.Field;
 
 public class HUDLogger extends Logger{
@@ -15,5 +19,17 @@ public class HUDLogger extends Logger{
         catch (NoSuchFieldException e) {
             throw new RuntimeException("Failed to create logger "+logName);
         }
+    }
+
+    @Override
+    public void removePlayer(String playerName){
+        EntityPlayer player = playerFromName(playerName);
+        if (player != null) HUDController.clear_player(player);
+        super.removePlayer(playerName);
+    }
+
+    @Override
+    public void sendPlayerMessage(EntityPlayer player, ITextComponent... messages) {
+        for (ITextComponent m:messages) HUDController.addMessage(player, m);
     }
 }

@@ -12,9 +12,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import static carpet.settings.RuleCategory.*;
+import static carpet.settings.RuleCategory.DISPENSER;
 
+@SuppressWarnings("CanBeFinal")
 public class CarpetSettings {
-    public static final String carpetVersion = "0.7.8+v200620";
+    public static final String carpetVersion = "0.8.1+v210620";
     public static final Logger LOG = LogManager.getLogger();
     public static boolean impendingFillSkipUpdates = false;
     public static AxisAlignedBB currentTelepotingEntityBox = null;
@@ -170,6 +172,15 @@ public class CarpetSettings {
     public static String commandLog = "true";
 
     @Rule(
+            desc = "sets these loggers in their default configurations for all new players",
+            extra = "use csv, like 'tps,mobcaps' for multiple loggers, none for nothing",
+            category = {CREATIVE, SURVIVAL},
+            options = {"none", "tps", "mobcaps,tps"},
+            strict = false
+    )
+    public static String defaultLoggers = "none";
+
+    @Rule(
             desc = "Enables /distance command to measure in game distance between points",
             extra = "Also enables brown carpet placement action if 'carpets' rule is turned on as well",
             category = COMMAND
@@ -188,6 +199,9 @@ public class CarpetSettings {
 
     @Rule(desc = "Enables /draw commands", extra = {"... allows for drawing simple shapes or","other shapes which are sorta difficult to do normally"}, category = COMMAND)
     public static String commandDraw = "true";
+
+    @Rule(desc = "Enables /player command to control/spawn players", category = COMMAND)
+    public static String commandPlayer = "true";
 
     @Rule(desc = "Placing carpets may issue carpet commands for non-op players", category = SURVIVAL)
     public static boolean carpets = false;
@@ -247,6 +261,16 @@ public class CarpetSettings {
             validate = FillLimitLimits.class
     )
     public static int forceloadLimit = 256;
+
+    @Rule(desc = "One player is required on the server to cause night to pass", category = SURVIVAL)
+    public static boolean onePlayerSleeping = false;
+
+    @Rule(
+            desc = "Cactus in dispensers rotates blocks.",
+            extra = "Rotates block anti-clockwise if possible",
+            category = {FEATURE, DISPENSER}
+    )
+    public static boolean rotatorBlock = false;
 
     @Rule(desc = "Coral structures will grow with bonemeal from coral plants", category = FEATURE)
     public static boolean renewableCoral = false;

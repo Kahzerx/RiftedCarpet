@@ -19,7 +19,7 @@ apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'java'
 
 group 'carpet'
-version '0.7.8'
+version '0.8.1'
 archivesBaseName = 'TISCarpetClient'
 
 sourceCompatibility = 1.8

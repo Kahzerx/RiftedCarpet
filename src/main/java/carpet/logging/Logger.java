@@ -6,9 +6,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.text.ITextComponent;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 
 public class Logger {
@@ -144,5 +142,33 @@ public class Logger {
                     sendPlayerMessage(player, messages);
             }
         }
+    }
+
+    public void onPlayerConnect(EntityPlayer player, boolean firstTime) {
+        // If the player was subscribed to the log and offline, move them to the set of online subscribers.
+        String playerName = player.getName().getString();
+        if (subscribedOfflinePlayers.containsKey(playerName)) {
+            subscribedOnlinePlayers.put(playerName, subscribedOfflinePlayers.get(playerName));
+            subscribedOfflinePlayers.remove(playerName);
+        }
+        else if(firstTime) {
+            Set<String> loggingOptions = new HashSet<>(Arrays.asList(CarpetSettings.defaultLoggers.split(",")));
+            if (loggingOptions.contains(getLogName())) {
+                LoggerRegistry.subscribePlayer(playerName, getLogName(), getDefault());
+            }
+        }
+        LoggerRegistry.setAccess(this);
+    }
+
+    public void onPlayerDisconnect(EntityPlayer player)
+    {
+        // If the player was subscribed to the log, move them to the set of offline subscribers.
+        String playerName = player.getName().getString();
+        if (subscribedOnlinePlayers.containsKey(playerName))
+        {
+            subscribedOfflinePlayers.put(playerName, subscribedOnlinePlayers.get(playerName));
+            subscribedOnlinePlayers.remove(playerName);
+        }
+        LoggerRegistry.setAccess(this);
     }
 }

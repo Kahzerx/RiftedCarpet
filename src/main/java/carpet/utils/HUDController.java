@@ -19,6 +19,27 @@ import java.util.*;
 
 public class HUDController {
     public static Map<EntityPlayer, List<ITextComponent>> player_huds = new HashMap<>();
+
+    public static void addMessage(EntityPlayer player, ITextComponent hudMessage)
+    {
+        if (!player_huds.containsKey(player))
+        {
+            player_huds.put(player, new ArrayList<>());
+        }
+        else
+        {
+            player_huds.get(player).add(new TextComponentString("\n"));
+        }
+        player_huds.get(player).add(hudMessage);
+    }
+
+    public static void clear_player(EntityPlayer player){
+        SPacketPlayerListHeaderFooter packet = new SPacketPlayerListHeaderFooter();
+        ((SPacketPlayerListHeaderFooterMixin)packet).setHeader(new TextComponentString(""));
+        ((SPacketPlayerListHeaderFooterMixin)packet).setFooter(new TextComponentString(""));
+        ((EntityPlayerMP)player).connection.sendPacket(packet);
+    }
+
     public static void update_hud(MinecraftServer server) {
         if(server.getTickCounter() % 20 != 0)
             return;

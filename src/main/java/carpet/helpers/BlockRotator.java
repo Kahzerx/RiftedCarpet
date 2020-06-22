@@ -1,12 +1,18 @@
 package carpet.helpers;
 
 import carpet.CarpetSettings;
+import carpet.fakes.PistonBlockInterface;
 import net.minecraft.block.*;
+import net.minecraft.block.state.BlockPistonStructureHelper;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.dispenser.BehaviorDefaultDispenseItem;
+import net.minecraft.dispenser.IBehaviorDispenseItem;
+import net.minecraft.dispenser.IBlockSource;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
 import net.minecraft.state.properties.Half;
 import net.minecraft.state.properties.SlabType;
 import net.minecraft.util.EnumFacing;
@@ -95,5 +101,120 @@ public class BlockRotator {
             return (!player.getHeldItemOffhand().isEmpty() && player.getHeldItemOffhand().getItem() instanceof ItemBlock && ((ItemBlock) (player.getHeldItemOffhand().getItem())).getBlock() == Blocks.CACTUS);
         }
         return false;
+    }
+
+    public static class CactusDispenserBehaviour extends BehaviorDefaultDispenseItem implements IBehaviorDispenseItem {
+        @Override
+        protected ItemStack dispenseStack(IBlockSource source, ItemStack stack){
+            if (CarpetSettings.rotatorBlock) return BlockRotator.dispenserRotate(source, stack);
+            else return super.dispenseStack(source, stack);
+        }
+    }
+
+    public static ItemStack dispenserRotate(IBlockSource source, ItemStack stack){
+        EnumFacing sourceFace = source.getBlockState().get(BlockDispenser.FACING);
+        World world = source.getWorld();
+        BlockPos pos = source.getBlockPos().offset(sourceFace);
+        IBlockState iBlockState = world.getBlockState(pos);
+        Block block = iBlockState.getBlock();
+
+        if (block instanceof BlockDirectional || block instanceof BlockDispenser){
+            EnumFacing face = iBlockState.get(BlockDirectional.FACING);
+            if (block instanceof BlockPistonBase && iBlockState.get(BlockPistonBase.EXTENDED) || (((PistonBlockInterface)block).publicShouldExtend(world, pos, face) && (new BlockPistonStructureHelper(world, pos, face, true)).canMove())) return stack;
+            EnumFacing rotated_face = rotateClockwise(face, sourceFace.getAxis());
+            if (sourceFace.getIndex() % 2 == 0 || rotated_face == face) rotated_face = rotated_face.getOpposite();
+            world.setBlockState(pos, iBlockState.with(BlockDirectional.FACING, rotated_face), 3);
+        }
+
+        else if (block instanceof BlockHorizontal){
+            if (block instanceof BlockBed) return stack;
+            EnumFacing face = iBlockState.get(BlockHorizontal.HORIZONTAL_FACING);
+            face = rotateClockwise(face, EnumFacing.Axis.Y);
+            if (sourceFace == EnumFacing.DOWN) face.getOpposite();
+            world.setBlockState(pos, iBlockState.with(BlockHorizontal.HORIZONTAL_FACING, face), 3);
+        }
+
+        else if (block == Blocks.HOPPER){
+            EnumFacing face = iBlockState.get(BlockHopper.FACING);
+            if (face != EnumFacing.DOWN){
+                face = rotateClockwise(face, EnumFacing.Axis.Y);
+                world.setBlockState(pos, iBlockState.with(BlockHopper.FACING, face), 3);
+            }
+        }
+        world.neighborChanged(pos, block, source.getBlockPos());
+        return stack;
+    }
+
+    private static EnumFacing rotateClockwise(EnumFacing direction, EnumFacing.Axis direction$Axis_1) {
+        switch(direction$Axis_1) {
+            case X:
+                if (direction != EnumFacing.WEST && direction != EnumFacing.EAST) {
+                    return rotateXClockwise(direction);
+                }
+
+                return direction;
+            case Y:
+                if (direction != EnumFacing.UP && direction != EnumFacing.DOWN) {
+                    return rotateYClockwise(direction);
+                }
+
+                return direction;
+            case Z:
+                if (direction != EnumFacing.NORTH && direction != EnumFacing.SOUTH) {
+                    return rotateZClockwise(direction);
+                }
+
+                return direction;
+            default:
+                throw new IllegalStateException("Unable to get CW facing for axis " + direction$Axis_1);
+        }
+    }
+
+    private static EnumFacing rotateYClockwise(EnumFacing dir) {
+        switch(dir) {
+            case NORTH:
+                return EnumFacing.EAST;
+            case EAST:
+                return EnumFacing.SOUTH;
+            case SOUTH:
+                return EnumFacing.WEST;
+            case WEST:
+                return EnumFacing.NORTH;
+            default:
+                throw new IllegalStateException("Unable to get Y-rotated facing of " + dir);
+        }
+    }
+
+    private static EnumFacing rotateXClockwise(EnumFacing dir) {
+        switch(dir) {
+            case NORTH:
+                return EnumFacing.DOWN;
+            case EAST:
+            case WEST:
+            default:
+                throw new IllegalStateException("Unable to get X-rotated facing of " + dir);
+            case SOUTH:
+                return EnumFacing.UP;
+            case UP:
+                return EnumFacing.NORTH;
+            case DOWN:
+                return EnumFacing.SOUTH;
+        }
+    }
+
+    private static EnumFacing rotateZClockwise(EnumFacing dir) {
+        switch(dir) {
+            case EAST:
+                return EnumFacing.DOWN;
+            case SOUTH:
+            default:
+                throw new IllegalStateException("Unable to get Z-rotated facing of " + dir);
+            case WEST:
+                return EnumFacing.UP;
+            case UP:
+                return EnumFacing.EAST;
+            case DOWN:
+                return EnumFacing.WEST;
+        }
     }
 }

@@ -2,6 +2,7 @@ package carpet.logging;
 
 import carpet.CarpetServer;
 import carpet.CarpetSettings;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumDyeColor;
 
 import java.lang.reflect.Field;
@@ -113,4 +114,23 @@ public class LoggerRegistry {
     }
 
     private static Set<String> seenPlayers = new HashSet<>();
+
+    public static void playerConnected(EntityPlayer player){
+        boolean firstTime = false;
+        if (!seenPlayers.contains(player.getName().getString())){
+            seenPlayers.add(player.getName().getString());
+            firstTime = true;
+        }
+        for(Logger log: loggerRegistry.values() ) {
+            log.onPlayerConnect(player, firstTime);
+        }
+    }
+
+    public static void playerDisconnected(EntityPlayer player)
+    {
+        for(Logger log: loggerRegistry.values() )
+        {
+            log.onPlayerDisconnect(player);
+        }
+    }
 }

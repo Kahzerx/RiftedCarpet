@@ -2,6 +2,7 @@ package carpet;
 
 import carpet.commands.*;
 import carpet.logging.LoggerRegistry;
+import carpet.network.ServerNetworkHandler;
 import carpet.settings.SettingsManager;
 import carpet.utils.HUDController;
 import carpet.utils.MobAI;
@@ -66,6 +67,7 @@ public class CarpetServer {
         LogCommand.register(dispatcher);
         DrawCommand.register(dispatcher);
         DistanceCommand.register(dispatcher);
+        PlayerCommand.register(dispatcher);
 
         extensions.forEach(e -> e.registerCommands(dispatcher));
         currentCommandDispatcher = dispatcher;
@@ -76,17 +78,19 @@ public class CarpetServer {
     }
 
     public static void onPlayerLoggedIn(EntityPlayerMP player) {
-        System.out.println("uwu");
+        ServerNetworkHandler.onPlayerJoin(player);
+        LoggerRegistry.playerConnected(player);
         extensions.forEach(e -> e.onPlayerLoggedIn(player));
     }
 
     public static void onPlayerLoggedOut(EntityPlayerMP player){
-        System.out.println("owo");
+        ServerNetworkHandler.onPlayerLoggedOut(player);
+        LoggerRegistry.playerDisconnected(player);
         extensions.forEach(e -> e.onPlayerLoggedOut(player));
     }
 
     public static void onServerClosed(MinecraftServer server){
-        System.out.println("rip");
+        ServerNetworkHandler.close();
         currentCommandDispatcher = null;
         LoggerRegistry.stopLoggers();
         extensions.forEach(e -> e.onServerClosed(server));
