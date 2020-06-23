@@ -3,6 +3,7 @@ package carpet;
 import carpet.commands.*;
 import carpet.logging.LoggerRegistry;
 import carpet.network.ServerNetworkHandler;
+import carpet.script.CarpetScriptServer;
 import carpet.settings.SettingsManager;
 import carpet.utils.HUDController;
 import carpet.utils.MobAI;
@@ -19,6 +20,7 @@ public class CarpetServer {
     public static final List<CarpetExtension> extensions = new ArrayList<>();
     public static MinecraftServer minecraft_server;
     private static CommandDispatcher<CommandSource> currentCommandDispatcher;
+    public static CarpetScriptServer scriptServer;
 
     // Separate from onServerLoaded, because a server can be loaded multiple times in singleplayer
     public static void manageExtension(CarpetExtension extension) {
@@ -46,12 +48,14 @@ public class CarpetServer {
             if (sm != null) sm.attachServer(server);
             e.onServerLoaded(server);
         });
+        scriptServer = new CarpetScriptServer();
         MobAI.resetTrackers();
         LoggerRegistry.initLoggers();
     }
 
     public static void tick(MinecraftServer server){
         HUDController.update_hud(server);
+        scriptServer.events.tick();
         //in case something happens
         CarpetSettings.impendingFillSkipUpdates = false;
         CarpetSettings.currentTelepotingEntityBox = null;
@@ -68,6 +72,7 @@ public class CarpetServer {
         DrawCommand.register(dispatcher);
         DistanceCommand.register(dispatcher);
         PlayerCommand.register(dispatcher);
+        ScriptCommand.register(dispatcher);
 
         extensions.forEach(e -> e.registerCommands(dispatcher));
         currentCommandDispatcher = dispatcher;

@@ -16,7 +16,7 @@ import static carpet.settings.RuleCategory.DISPENSER;
 
 @SuppressWarnings("CanBeFinal")
 public class CarpetSettings {
-    public static final String carpetVersion = "0.8.1+v210620";
+    public static final String carpetVersion = "0.8.8+v220620";
     public static final Logger LOG = LogManager.getLogger();
     public static boolean impendingFillSkipUpdates = false;
     public static AxisAlignedBB currentTelepotingEntityBox = null;
@@ -199,6 +199,9 @@ public class CarpetSettings {
 
     @Rule(desc = "Enables /draw commands", extra = {"... allows for drawing simple shapes or","other shapes which are sorta difficult to do normally"}, category = COMMAND)
     public static String commandDraw = "true";
+
+    @Rule(desc = "Enables /script command", extra = "WIP... An in-game scripting API for Scarpet programming language", category = COMMAND)
+    public static boolean commandScript = true;
 
     @Rule(desc = "Enables /player command to control/spawn players", category = COMMAND)
     public static String commandPlayer = "true";
