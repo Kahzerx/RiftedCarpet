@@ -151,7 +151,9 @@ public class SettingsManager
 
     public void notifyPlayersCommandsChanged(){
         if (server.getPlayerList() == null) return;
-        for (EntityPlayerMP entityPlayerMP : server.getPlayerList().getPlayers()) server.getCommandManager().send(entityPlayerMP);
+        for (EntityPlayerMP entityPlayerMP : server.getPlayerList().getPlayers()){
+            server.getCommandManager().send(entityPlayerMP);
+        }
     }
 
     private void registerCommand(CommandDispatcher<CommandSource> dispatcher){

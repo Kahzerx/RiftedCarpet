@@ -73,6 +73,8 @@ public class CarpetServer {
         DistanceCommand.register(dispatcher);
         PlayerCommand.register(dispatcher);
         ScriptCommand.register(dispatcher);
+        InfoCommand.register(dispatcher);
+        PerimeterInfoCommand.register(dispatcher);
 
         extensions.forEach(e -> e.registerCommands(dispatcher));
         currentCommandDispatcher = dispatcher;

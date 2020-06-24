@@ -12,11 +12,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import static carpet.settings.RuleCategory.*;
-import static carpet.settings.RuleCategory.DISPENSER;
 
 @SuppressWarnings("CanBeFinal")
 public class CarpetSettings {
-    public static final String carpetVersion = "0.8.8+v220620";
+    public static final String carpetVersion = "0.9.0+v230620";
     public static final Logger LOG = LogManager.getLogger();
     public static boolean impendingFillSkipUpdates = false;
     public static AxisAlignedBB currentTelepotingEntityBox = null;
@@ -188,6 +187,16 @@ public class CarpetSettings {
     public static String commandDistance = "true";
 
     @Rule(
+            desc = "Enables /info command for blocks",
+            extra = {
+                    "Also enables gray carpet placement action",
+                    "if 'carpets' rule is turned on as well"
+            },
+            category = COMMAND
+    )
+    public static String commandInfo = "true";
+
+    @Rule(
             desc = "Enables /c and /s commands to quickly switch between camera and survival modes",
             extra = {
                     "/c and /s commands are available to all players regardless of their permission levels",
@@ -196,6 +205,13 @@ public class CarpetSettings {
             category = COMMAND
     )
     public static String commandCameramode = "true";
+
+    @Rule(
+            desc = "Enables /perimeterinfo command",
+            extra = "... that scans the area around the block for potential spawnable spots",
+            category = COMMAND
+    )
+    public static String commandPerimeterInfo = "true";
 
     @Rule(desc = "Enables /draw commands", extra = {"... allows for drawing simple shapes or","other shapes which are sorta difficult to do normally"}, category = COMMAND)
     public static String commandDraw = "true";
