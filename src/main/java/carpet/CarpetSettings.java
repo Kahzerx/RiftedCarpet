@@ -300,4 +300,19 @@ public class CarpetSettings {
             category = CLIENT
     )
     public static boolean fogOff = false;
+
+    @Rule(
+            desc = "Creative No Clip",
+            extra = {
+                    "On servers it needs to be set on both ",
+                    "client and server to function properly.",
+                    "Has no effect when set on the server only",
+                    "Can allow to phase through walls",
+                    "if only set on the carpet client side",
+                    "but requires some trapdoor magic to",
+                    "allow the player to enter blocks"
+            },
+            category = {CREATIVE, CLIENT}
+    )
+    public static boolean creativeNoClip = false;
 }

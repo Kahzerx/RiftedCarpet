@@ -31,6 +31,7 @@
     "EntityPlayer_parrotMixin",
     "EntityPlayer_portalDelayMixin",
     "EntityPlayerMPMixin",
+    "EntityPlayerNoClipMixin",
     "EntitySpawnPlacementRegistryMixin",
     "EntityTntMixin",
     "EntityXPOrbMixin",
@@ -40,6 +41,7 @@
     "ForceLoadCommandMixin",
     "GuiIngameMixin",
     "GuiPlayerTabOverlayMixin",
+    "ItemBlockNoClipMixin",
     "ItemPickaxeMTMixin",
     "ItemShearsMTMixin",
     "ItemUseContextCactusMixin",
@@ -55,6 +57,7 @@
     "SummonCommandMixin",
     "Teleporter_portalSuffocationMixin",
     "TileEntityHopperMixin",
+    "TileEntityPistonNoClipMixin",
     "WeightedRandomMixin",
     "WorldEntitySpawnerMixin",
     "WorldServerOnePlayerSleepingMixin"
@@ -62,7 +65,8 @@
   "client": [
     "ClientMixin",
     "FogRendererFogOffMixin",
-    "IntegratedServerMixin"
+    "IntegratedServerMixin",
+    "GameRendererNoClipMixin"
   ],
   "injectors": {
     "defaultRequire": 1

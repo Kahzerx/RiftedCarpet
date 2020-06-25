@@ -25,7 +25,7 @@ public abstract class ExplosionMixin {
     }
 
     @Redirect(method = "doExplosionA", require = 0, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;getBlockState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/state/IBlockState;"))
-    private IBlockState onExplosionA(World world, BlockPos blockPos){
+    private IBlockState noBlockCalcsWithNoBLockDamage(World world, BlockPos blockPos){
         if (CarpetSettings.explosionNoBlockDamage) return Blocks.BEDROCK.getDefaultState();
         return world.getBlockState(blockPos);
     }
