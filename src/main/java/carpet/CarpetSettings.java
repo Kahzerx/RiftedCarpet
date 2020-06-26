@@ -15,7 +15,7 @@ import static carpet.settings.RuleCategory.*;
 
 @SuppressWarnings("CanBeFinal")
 public class CarpetSettings {
-    public static final String carpetVersion = "0.9.0+v230620";
+    public static final String carpetVersion = "0.9.2+v240620";
     public static final Logger LOG = LogManager.getLogger();
     public static boolean impendingFillSkipUpdates = false;
     public static AxisAlignedBB currentTelepotingEntityBox = null;
@@ -166,6 +166,9 @@ public class CarpetSettings {
             extra = "You may need to setDefault true/false, exit and join the world for /counter to appear or not in command list",
             category = COMMAND)
     public static String commandSpawn = "false";
+
+    @Rule(desc = "Enables /tick command to control game clocks", category = COMMAND)
+    public static String commandTick = "true";
 
     @Rule(desc = "Enables /log command to monitor events via chat and overlays", category = COMMAND)
     public static String commandLog = "true";

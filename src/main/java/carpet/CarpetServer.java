@@ -1,6 +1,7 @@
 package carpet;
 
 import carpet.commands.*;
+import carpet.helpers.TickSpeed;
 import carpet.logging.LoggerRegistry;
 import carpet.network.ServerNetworkHandler;
 import carpet.script.CarpetScriptServer;
@@ -54,6 +55,7 @@ public class CarpetServer {
     }
 
     public static void tick(MinecraftServer server){
+        TickSpeed.tick(server);
         HUDController.update_hud(server);
         scriptServer.events.tick();
         //in case something happens
@@ -75,6 +77,7 @@ public class CarpetServer {
         ScriptCommand.register(dispatcher);
         InfoCommand.register(dispatcher);
         PerimeterInfoCommand.register(dispatcher);
+        TickCommand.register(dispatcher);
 
         extensions.forEach(e -> e.registerCommands(dispatcher));
         currentCommandDispatcher = dispatcher;
@@ -106,6 +109,7 @@ public class CarpetServer {
     }
 
     public static void disconnect(){
+        TickSpeed.reset();
         settingsManager.detachServer();
     }
 

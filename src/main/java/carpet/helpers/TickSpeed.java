@@ -24,6 +24,23 @@ public class TickSpeed {
     public static boolean is_paused = false;
     public static boolean is_superHot = false;
 
+    public static void reset()
+    {
+        tickrate = 20.0f;
+        mspt = 50.0f;
+        time_bias = 0;
+        time_warp_start_time = 0;
+        time_warp_scheduled_ticks = 0;
+        time_advancerer = null;
+        tick_warp_callback = null;
+        tick_warp_sender = null;
+        player_active_timeout = 0;
+        process_entities = true;
+        deepFreeze = false;
+        is_paused = false;
+        is_superHot = false;
+    }
+
     public static void reset_player_active_timeout()
     {
         if (player_active_timeout < PLAYER_GRACE)

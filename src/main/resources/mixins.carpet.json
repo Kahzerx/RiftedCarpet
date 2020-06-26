@@ -46,8 +46,10 @@
     "ItemShearsMTMixin",
     "ItemUseContextCactusMixin",
     "MinecraftServer_coreMixin",
+    "MinecraftServerTickMixin",
     "NetHandlerPlayServer_coreMixin",
     "NetHandlerPlayServerMixin",
+    "NetHandlerPlayServerTickMixin",
     "PathNavigatePathfindingMixin",
     "PlayerInteractionManagerMixin",
     "PlayerList_coreMixin",
@@ -60,13 +62,15 @@
     "TileEntityPistonNoClipMixin",
     "WeightedRandomMixin",
     "WorldEntitySpawnerMixin",
-    "WorldServerOnePlayerSleepingMixin"
+    "WorldServerOnePlayerSleepingMixin",
+    "WorldServerTickMixin",
+    "WorldTickMixin"
   ],
   "client": [
     "ClientMixin",
     "FogRendererFogOffMixin",
-    "IntegratedServerMixin",
-    "GameRendererNoClipMixin"
+    "GameRendererNoClipMixin",
+    "IntegratedServerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
