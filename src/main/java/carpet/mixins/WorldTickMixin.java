@@ -29,6 +29,8 @@ public abstract class WorldTickMixin implements IEntityReader, IWorld, IWorldRea
     CarpetProfiler.ProfilerToken tok_entities;
     CarpetProfiler.ProfilerToken tok;
 
+    Boolean started = false;
+
     @Shadow public abstract void tickEntity(Entity ent);
 
     @Shadow @Final public Dimension dimension;
@@ -72,12 +74,15 @@ public abstract class WorldTickMixin implements IEntityReader, IWorld, IWorldRea
 
     @Inject(method = "tickEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/tileentity/TileEntity;isRemoved()Z", ordinal = 0), locals = LocalCapture.CAPTURE_FAILHARD)
     public void startTok2(CallbackInfo ci, Iterator iterator, TileEntity tileentity){
-        this.tok = CarpetProfiler.start_tileentity_section(world_name, tileentity);
+        if (this.started) CarpetProfiler.end_current_entity_section(this.tok);
+        this.tok = CarpetProfiler.start_tileentity_section(this.world_name, tileentity);
+        this.started = true;
     }
 
-    @Inject(method = "tickEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/tileentity/TileEntity;isRemoved()Z", ordinal = 1))
+    @Inject(method = "tickEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/profiler/Profiler;endStartSection(Ljava/lang/String;)V", ordinal = 3))
     public void endTok2(CallbackInfo ci){
-        CarpetProfiler.end_current_entity_section(this.tok);
+        if (this.started) CarpetProfiler.end_current_entity_section(this.tok);
+        this.started = false;
     }
 
     @Inject(method = "tickEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/profiler/Profiler;endSection()V", ordinal = 3))
