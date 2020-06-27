@@ -10,6 +10,7 @@ import net.minecraft.world.IEntityReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
+import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.dimension.Dimension;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -37,15 +38,17 @@ public abstract class WorldTickMixin implements IEntityReader, IWorld, IWorldRea
 
     @Shadow @Final public boolean isRemote;
 
+    @Shadow @Final private WorldBorder worldBorder;
+
     @Redirect(method = "tickEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;tickEntity(Lnet/minecraft/entity/Entity;)V"))
     public void tickEntity(World world, Entity ent){
         if (TickSpeed.process_entities || ent instanceof EntityPlayer) this.tickEntity(ent);
         else return;
     }
 
-    @Redirect(method = "tickEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;isBlockLoaded(Lnet/minecraft/util/math/BlockPos;)Z"))
-    public boolean isLoaded(World world, BlockPos pos){
-        if (TickSpeed.process_entities) return isBlockLoaded(pos);
+    @Redirect(method = "tickEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/border/WorldBorder;contains(Lnet/minecraft/util/math/BlockPos;)Z"))
+    public boolean contains(WorldBorder worldBorder, BlockPos pos){
+        if (TickSpeed.process_entities) return this.worldBorder.contains(pos);
         else return false;
     }
 
