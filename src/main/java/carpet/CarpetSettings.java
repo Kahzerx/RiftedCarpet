@@ -308,9 +308,6 @@ public class CarpetSettings {
     @Rule(desc = "Coral structures will grow with bonemeal from coral plants", category = FEATURE)
     public static boolean renewableCoral = false;
 
-    @Rule(desc = "Spawning requires much less CPU and Memory", category = OPTIMIZATION)
-    public static boolean lagFreeSpawning = false;
-
     @Rule(
             desc = "Removes fog from client in the nether and the end",
             extra = "Improves visibility, but looks weird",
