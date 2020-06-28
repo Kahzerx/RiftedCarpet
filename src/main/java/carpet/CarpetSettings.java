@@ -12,6 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import static carpet.settings.RuleCategory.*;
+import static carpet.settings.RuleCategory.OPTIMIZATION;
 
 @SuppressWarnings("CanBeFinal")
 public class CarpetSettings {
@@ -276,6 +277,16 @@ public class CarpetSettings {
     public static int fillLimit = 32768;
 
     @Rule(
+            desc = "Customizable maximal entity collision limits, 0 for no limits",
+            options = {"0", "1", "20"},
+            category = OPTIMIZATION,
+            strict = false,
+            validate = Validator.NONNEGATIVE_NUMBER.class
+    )
+    public static int maxEntityCollisions = 0;
+
+
+    @Rule(
             desc = "Customizable forceload chunk limit",
             options = {"256"},
             category = CREATIVE,
@@ -296,6 +307,9 @@ public class CarpetSettings {
 
     @Rule(desc = "Coral structures will grow with bonemeal from coral plants", category = FEATURE)
     public static boolean renewableCoral = false;
+
+    @Rule(desc = "Spawning requires much less CPU and Memory", category = OPTIMIZATION)
+    public static boolean lagFreeSpawning = false;
 
     @Rule(
             desc = "Removes fog from client in the nether and the end",

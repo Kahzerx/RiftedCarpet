@@ -28,6 +28,7 @@
     "EntityEnderPearlMixin",
     "EntityGuardianMixin",
     "EntityItemMixin",
+    "EntityLivingBaseEntityCollisionMixin",
     "EntityPlayer_parrotMixin",
     "EntityPlayer_portalDelayMixin",
     "EntityPlayerMPMixin",
