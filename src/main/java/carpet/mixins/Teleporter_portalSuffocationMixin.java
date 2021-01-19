@@ -2,7 +2,6 @@ package carpet.mixins;
 
 import carpet.CarpetSettings;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import javafx.beans.binding.MapExpression;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.state.pattern.BlockPattern;
 import net.minecraft.entity.Entity;
