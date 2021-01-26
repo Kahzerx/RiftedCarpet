@@ -30,6 +30,9 @@ Thumbs.db
 
 #ty masa <3
 rift_libs/
+logs/
+crash-reports/
+.mixin.out/
 
 #my stuff
 TODO.txt
