@@ -12,8 +12,10 @@ To help develop this mod you need:
 - `git clone https://github.com/Kahzerx/RiftedCarpet.git`
 - `cd RiftedCarpet`
 - `Place the rift_libs folder on that directory (http://maruohon.kapsi.fi/minecraft/rift_1.13.2_with_libs.zip)`
-- `gradlew setupDevWorkspace <eclipse/idea>`
+- `gradlew setupDevWorkspace`
 
 Open the project with eclipse/idea and on `External libraries` -> `start` -> `net.minecraftforge.gradle` -> and run `GradleStart`.
-set `--tweakClass org.dimdev.riftloader.launch.RiftLoaderClientTweaker` as program arguments.
+
+Set `--tweakClass org.dimdev.riftloader.launch.RiftLoaderClientTweaker` as program arguments.
+
 Java `1.8` and `classpath module` -> `RiftedCarpet.main`.
