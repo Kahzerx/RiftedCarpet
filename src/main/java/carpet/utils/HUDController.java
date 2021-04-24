@@ -4,7 +4,7 @@ import carpet.helpers.HopperCounter;
 import carpet.helpers.TickSpeed;
 import carpet.logging.LoggerRegistry;
 import carpet.logging.logHelpers.PacketCounter;
-import carpet.mixins.SPacketPlayerListHeaderFooterMixin;
+import carpet.mixins.bot.SPacketPlayerListHeaderFooterMixin;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;

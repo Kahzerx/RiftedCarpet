@@ -115,7 +115,7 @@ public class SettingsManager
                         CarpetSettings.LOG.error("[CM]: "+fancyName+" Setting " + fields[0] + " is not a valid - ignoring...");
                         continue;
                     }
-                    ParsedRule rule = rules.get(fields[0]);
+                    ParsedRule<?> rule = rules.get(fields[0]);
                     if (!(rule.options.contains(fields[1])) && rule.isStrict){
                         CarpetSettings.LOG.error("[CM]: The value of " + fields[1] + " for " + fields[0] + "("+fancyName+") is not valid - ignoring...");
                         continue;

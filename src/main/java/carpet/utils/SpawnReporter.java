@@ -1,36 +1,25 @@
 package carpet.utils;
 
-import java.util.List;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import carpet.mixins.WeightedRandomMixin;
-import net.minecraft.server.MinecraftServer;
+import carpet.mixins.spawn.WeightedRandomMixin;
+import net.minecraft.entity.*;
+import net.minecraft.entity.passive.EntityOcelot;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.Tuple;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.IRegistry;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
-import net.minecraft.util.math.BlockPos;
-
-import net.minecraft.item.EnumDyeColor;
-
-import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.world.WorldEntitySpawner;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.ChunkProviderServer;
-import net.minecraft.world.WorldEntitySpawner;
-import net.minecraft.entity.EntitySpawnPlacementRegistry;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.Entity;
-
-import net.minecraft.entity.passive.EntityOcelot;
 import net.minecraft.world.gen.Heightmap;
 
-import java.lang.Math;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 public class SpawnReporter
@@ -40,16 +29,16 @@ public class SpawnReporter
 
     public static Long track_spawns = 0L;
     public static final HashMap<Integer, HashMap<EnumCreatureType, Tuple<Integer,Integer>>> mobcaps = new HashMap<>();
-    public static final HashMap<String, HashMap<String,Long>> spawn_stats = new HashMap<String, HashMap<String,Long>>();
+    public static final HashMap<String, HashMap<String,Long>> spawn_stats = new HashMap<>();
     public static double mobcap_exponent = 0.0D;
 
-    public static final HashMap<String, Long> spawn_attempts = new HashMap<String, Long>();
-    public static final HashMap<String, Long> overall_spawn_ticks = new HashMap<String, Long>();
-    public static final HashMap<String, Long> spawn_ticks_full = new HashMap<String, Long>();
-    public static final HashMap<String, Long> spawn_ticks_fail = new HashMap<String, Long>();
-    public static final HashMap<String, Long> spawn_ticks_succ = new HashMap<String, Long>();
-    public static final HashMap<String, Long> spawn_ticks_spawns = new HashMap<String, Long>();
-    public static final HashMap<String, Long> spawn_cap_count = new HashMap<String, Long>();
+    public static final HashMap<String, Long> spawn_attempts = new HashMap<>();
+    public static final HashMap<String, Long> overall_spawn_ticks = new HashMap<>();
+    public static final HashMap<String, Long> spawn_ticks_full = new HashMap<>();
+    public static final HashMap<String, Long> spawn_ticks_fail = new HashMap<>();
+    public static final HashMap<String, Long> spawn_ticks_succ = new HashMap<>();
+    public static final HashMap<String, Long> spawn_ticks_spawns = new HashMap<>();
+    public static final HashMap<String, Long> spawn_cap_count = new HashMap<>();
     public static class SpawnPos
     {
         public String mob;
@@ -155,6 +144,7 @@ public class SpawnReporter
                 //return print_general_mobcaps(worldIn);
             }
         }
+        assert under != null;
         String creature_type = get_type_code_from_wool_code(under);
         if (creature_type != null)
         {

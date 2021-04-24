@@ -31,61 +31,49 @@ public class BlockRotator {
         CarpetSettings.impendingFillSkipUpdates = false;
         return retval;
     }
+
     public static boolean flip_block(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         Block block = state.getBlock();
         if ((block instanceof BlockGlazedTerracotta) || (block instanceof BlockRedstoneDiode) || (block instanceof BlockRailBase) || (block instanceof BlockTrapDoor) || (block instanceof BlockLever) || (block instanceof BlockFenceGate)) {
             worldIn.setBlockState(pos, block.rotate(state, Rotation.CLOCKWISE_90), 2 | 1024);
-        }
-        else if ((block instanceof BlockObserver) || (block instanceof BlockEndRod)) {
+        } else if ((block instanceof BlockObserver) || (block instanceof BlockEndRod)) {
             worldIn.setBlockState(pos, state.with(BlockDirectional.FACING, (EnumFacing)state.get(BlockDirectional.FACING).getOpposite()), 2 | 1024);
-        }
-        else if (block instanceof BlockDispenser) {
+        } else if (block instanceof BlockDispenser) {
             worldIn.setBlockState(pos, state.with(BlockDispenser.FACING, state.get(BlockDispenser.FACING).getOpposite()), 2 | 1024);
-        }
-        else if (block instanceof BlockPistonBase) {
+        } else if (block instanceof BlockPistonBase) {
             if (!(state.get(BlockPistonBase.EXTENDED))) worldIn.setBlockState(pos, state.with(BlockDirectional.FACING, state.get(BlockDirectional.FACING).getOpposite()), 2 | 1024);
-        }
-        else if (block instanceof BlockSlab) {
+        } else if (block instanceof BlockSlab) {
             if (!((BlockSlab) block).isFullCube(state)) {
                 worldIn.setBlockState(pos, state.with(BlockSlab.TYPE, state.get(BlockSlab.TYPE) == SlabType.TOP ? SlabType.BOTTOM : SlabType.TOP), 2 | 1024);
             }
-        }
-        else if (block instanceof BlockHopper) {
+        } else if (block instanceof BlockHopper) {
             if ((EnumFacing)state.get(BlockHopper.FACING) != EnumFacing.DOWN) {
                 worldIn.setBlockState(pos, state.with(BlockHopper.FACING, state.get(BlockHopper.FACING).rotateY()), 2 | 1024);
             }
-        }
-        else if (block instanceof BlockStairs) {
+        } else if (block instanceof BlockStairs) {
             //LOG.error(String.format("hit with facing: %s, at side %.1fX, X %.1fY, Y %.1fZ",facing, hitX, hitY, hitZ));
             if ((facing == EnumFacing.UP && hitY == 1.0f) || (facing == EnumFacing.DOWN && hitY == 0.0f)) {
                 worldIn.setBlockState(pos, state.with(BlockStairs.HALF, state.get(BlockStairs.HALF) == Half.TOP ? Half.BOTTOM : Half.TOP ), 2 | 1024);
-            }
-            else {
+            } else {
                 boolean turn_right;
                 if (facing == EnumFacing.NORTH) {
                     turn_right = (hitX <= 0.5);
-                }
-                else if (facing == EnumFacing.SOUTH) {
+                } else if (facing == EnumFacing.SOUTH) {
                     turn_right = !(hitX <= 0.5);
-                }
-                else if (facing == EnumFacing.EAST) {
+                } else if (facing == EnumFacing.EAST) {
                     turn_right = (hitZ <= 0.5);
-                }
-                else if (facing == EnumFacing.WEST) {
+                } else if (facing == EnumFacing.WEST) {
                     turn_right = !(hitZ <= 0.5);
-                }
-                else {
+                } else {
                     return false;
                 }
                 if (turn_right) {
                     worldIn.setBlockState(pos, block.rotate(state, Rotation.COUNTERCLOCKWISE_90), 2 | 1024);
-                }
-                else {
+                } else {
                     worldIn.setBlockState(pos, block.rotate(state, Rotation.CLOCKWISE_90), 2 | 1024);
                 }
             }
-        }
-        else {
+        } else {
             return false;
         }
         worldIn.markBlockRangeForRenderUpdate(pos, pos);
@@ -118,23 +106,19 @@ public class BlockRotator {
         IBlockState iBlockState = world.getBlockState(pos);
         Block block = iBlockState.getBlock();
 
-        if (block instanceof BlockDirectional || block instanceof BlockDispenser){
+        if (block instanceof BlockDirectional || block instanceof BlockDispenser) {
             EnumFacing face = iBlockState.get(BlockDirectional.FACING);
             if (block instanceof BlockPistonBase && iBlockState.get(BlockPistonBase.EXTENDED) || (((PistonBlockInterface)block).publicShouldExtend(world, pos, face) && (new BlockPistonStructureHelper(world, pos, face, true)).canMove())) return stack;
             EnumFacing rotated_face = rotateClockwise(face, sourceFace.getAxis());
             if (sourceFace.getIndex() % 2 == 0 || rotated_face == face) rotated_face = rotated_face.getOpposite();
             world.setBlockState(pos, iBlockState.with(BlockDirectional.FACING, rotated_face), 3);
-        }
-
-        else if (block instanceof BlockHorizontal){
+        } else if (block instanceof BlockHorizontal) {
             if (block instanceof BlockBed) return stack;
             EnumFacing face = iBlockState.get(BlockHorizontal.HORIZONTAL_FACING);
             face = rotateClockwise(face, EnumFacing.Axis.Y);
             if (sourceFace == EnumFacing.DOWN) face.getOpposite();
             world.setBlockState(pos, iBlockState.with(BlockHorizontal.HORIZONTAL_FACING, face), 3);
-        }
-
-        else if (block == Blocks.HOPPER){
+        } else if (block == Blocks.HOPPER) {
             EnumFacing face = iBlockState.get(BlockHopper.FACING);
             if (face != EnumFacing.DOWN){
                 face = rotateClockwise(face, EnumFacing.Axis.Y);

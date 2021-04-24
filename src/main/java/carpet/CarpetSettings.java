@@ -16,11 +16,12 @@ import static carpet.settings.RuleCategory.OPTIMIZATION;
 
 @SuppressWarnings("CanBeFinal")
 public class CarpetSettings {
-    public static final String carpetVersion = "0.9.2+v240620";
+    public static final String carpetVersion = "1.0.0+v240421";
     public static final Logger LOG = LogManager.getLogger();
     public static boolean impendingFillSkipUpdates = false;
     public static AxisAlignedBB currentTelepotingEntityBox = null;
     public static Vec3d fixedPosition = null;
+    public static final int vanillaStructureBlockLimit = 48;
 
     private static class LanguageValidator extends Validator<String>{
         @Override public String validate(CommandSource source, ParsedRule<String> currentRule, String newValue, String string) {
@@ -103,10 +104,6 @@ public class CarpetSettings {
     @Rule( desc = "Removes random TNT momentum when primed", category = {CREATIVE, TNT} )
     public static boolean tntPrimerMomentumRemoved = false;
 
-    @Rule( desc = "Sets the horizontal random angle on TNT for debugging of TNT contraptions", category = TNT, options = "-1", strict = false,
-            validate = TNTAngleValidator.class, extra = "Set to -1 for default behavior")
-    public static double hardcodeTNTangle = -1.0D;
-
     private static class TNTAngleValidator extends Validator<Double> {
         @Override
         public Double validate(CommandSource source, ParsedRule<Double> currentRule, Double newValue, String string) {
@@ -118,6 +115,10 @@ public class CarpetSettings {
             return "Must be between 0 and 2pi, or -1";
         }
     }
+
+    @Rule( desc = "Sets the horizontal random angle on TNT for debugging of TNT contraptions", category = TNT, options = "-1", strict = false,
+            validate = TNTAngleValidator.class, extra = "Set to -1 for default behavior")
+    public static double hardcodeTNTangle = -1.0D;
 
     @Rule( desc = "Shulkers will respawn in end cities", category = FEATURE )
     public static boolean shulkerSpawningInEndCities = false;

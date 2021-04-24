@@ -143,7 +143,7 @@ public class PlayerCommand {
     private static EntityPlayerMP getPlayer(CommandContext<CommandSource> context) {
         String playerName = getString(context,"player");
         MinecraftServer server = context.getSource().getServer();
-        return (EntityPlayerMP) server.getPlayerList().getPlayerByUsername(playerName);
+        return server.getPlayerList().getPlayerByUsername(playerName);
     }
 
     private static boolean cantSpawn(CommandContext<CommandSource> context) {
