@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import carpet.mixins.WeightedRandomMixin;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.registry.IRegistry;
 import net.minecraft.util.text.ITextComponent;
@@ -30,6 +31,7 @@ import net.minecraft.entity.passive.EntityOcelot;
 import net.minecraft.world.gen.Heightmap;
 
 import java.lang.Math;
+import java.util.Objects;
 
 public class SpawnReporter
 {
@@ -266,19 +268,15 @@ public class SpawnReporter
         mock_spawns = false;
 
     }
-    public static void reset_spawn_stats(boolean full)
-    {
+    public static void reset_spawn_stats(boolean full) {
         spawn_stats.clear();
         spawned_mobs.clear();
-        for (EnumCreatureType enumcreaturetype : EnumCreatureType.values())
-        {
+        for (EnumCreatureType enumcreaturetype : EnumCreatureType.values()) {
             String type_code = String.format("%s", enumcreaturetype);
-            if (full)
-            {
+            if (full) {
                 spawn_tries.put(type_code, 1);
             }
-            for (String suffix: new String[] {""," (N)"," (E)"})
-            {
+            for (String suffix: new String[] {""," (N)"," (E)"}) {
                 String code = type_code+suffix;
                 overall_spawn_ticks.put(code, 0L);
                 spawn_attempts.put(code, 0L);
@@ -309,7 +307,7 @@ public class SpawnReporter
                     "w ' to enable"));
             return report;
         }
-        Long duration = (long) worldIn.getServer().getTickCounter() - track_spawns;
+        long duration = (long) Objects.requireNonNull(worldIn.getServer()).getTickCounter() - track_spawns;
         report.add(Messenger.c("bw --------------------"));
         String simulated = mock_spawns?"[SIMULATED] ":"";
         String location = (lower_spawning_limit != null)?String.format("[in (%d, %d, %d)x(%d, %d, %d)]",
@@ -358,7 +356,7 @@ public class SpawnReporter
     {
         if (entity.isPassenger())
         {
-            entity.getRidingEntity().remove();
+            Objects.requireNonNull(entity.getRidingEntity()).remove();
         }
         if (entity.isBeingRidden())
         {

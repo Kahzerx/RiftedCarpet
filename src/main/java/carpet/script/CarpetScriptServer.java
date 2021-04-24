@@ -42,8 +42,7 @@ public class CarpetScriptServer
         add(new CameraPathModule());
     }};
 
-    public CarpetScriptServer()
-    {
+    public CarpetScriptServer() {
         globalHost = createMinecraftScriptHost(null);
         events = new CarpetEventServer();
         modules = new HashMap<>();

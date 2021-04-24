@@ -156,7 +156,7 @@ public class SettingsManager
         }
     }
 
-    private void registerCommand(CommandDispatcher<CommandSource> dispatcher){
+    public void registerCommand(CommandDispatcher<CommandSource> dispatcher){
         if (dispatcher.getRoot().getChildren().stream().anyMatch(node -> node.getName().equalsIgnoreCase(identifier))){
             CarpetSettings.LOG.error("Failed to add settings command for " + identifier + ". It is masking previous command.");
             return;

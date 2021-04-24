@@ -21,6 +21,15 @@ public interface CarpetExtension {
     default void onServerLoaded(MinecraftServer server) {}
 
     /**
+     * Runs once per loaded world once the World files are fully loaded
+     * Can be loaded multiple times in SinglePlayer
+     *
+     * @param server The current {@link MinecraftServer} instance
+     *
+     */
+    default void onServerLoadedWorlds(MinecraftServer server) {}
+
+    /**
      * Runs once per game tick, as a first thing in the tick
      */
     default void onTick(MinecraftServer server) {}
@@ -38,6 +47,15 @@ public interface CarpetExtension {
     default SettingsManager customSettingsManager() {return null;}
 
     default void onServerClosed(MinecraftServer server) {}
+
+    /**
+     * Event that gets called when the server reloads (usually
+     * when running the /reload command)
+     *
+     * @param server The {@link MinecraftServer} that is reloading
+     *
+     */
+    default void onReload(MinecraftServer server) {}
 
     default String version() {return null;}
 
