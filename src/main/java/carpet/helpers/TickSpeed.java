@@ -1,12 +1,16 @@
 package carpet.helpers;
 
 import carpet.CarpetServer;
+import carpet.network.ServerNetworkHandler;
 import carpet.utils.Messenger;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.ITextComponent;
+
+import java.util.Map;
+import java.util.function.BiConsumer;
 
 public class TickSpeed {
     public static final int PLAYER_GRACE = 2;
@@ -54,12 +58,12 @@ public class TickSpeed {
         player_active_timeout = PLAYER_GRACE+ticks;
     }
 
-    public static void tickrate(float rate)    {
+    public static void tickrate(float rate) {
         tickrate = rate;
         mspt = (long)(1000.0/tickrate);
         if (mspt <=0)
         {
-            mspt = 1l;
+            mspt = 1L;
             tickrate = 1000.0f;
         }
     }
@@ -156,7 +160,7 @@ public class TickSpeed {
         }
     }
 
-    public static void tick(MinecraftServer server)
+    public static void tick()
     {
         process_entities = true;
         if (player_active_timeout > 0)

@@ -133,7 +133,8 @@ public class ServerNetworkHandler {
     }
 
     private static class DataBuilder {
-        private NBTTagCompound tag;
+        private final NBTTagCompound tag;
+
         private static DataBuilder create()
         {
             return new DataBuilder();
@@ -142,10 +143,12 @@ public class ServerNetworkHandler {
         {
             tag = new NBTTagCompound();
         }
+
         private DataBuilder withTickRate() {
             tag.putFloat("TickRate", TickSpeed.tickrate);
             return this;
         }
+
         private DataBuilder withRule(ParsedRule<?> rule) {
             NBTTagCompound rules = (NBTTagCompound) tag.get("Rules");
             if (rules == null) {

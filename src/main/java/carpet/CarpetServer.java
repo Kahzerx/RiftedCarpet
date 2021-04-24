@@ -62,7 +62,7 @@ public class CarpetServer {
     }
 
     public static void tick(MinecraftServer server) {
-        TickSpeed.tick(server);
+        TickSpeed.tick();
         HUDController.update_hud(server);
         scriptServer.events.tick();
         //in case something happens

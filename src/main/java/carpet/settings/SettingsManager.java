@@ -409,4 +409,21 @@ public class SettingsManager
         }
         return false;
     }
+
+    public void inspectClientsideCommand(CommandSource source, String string)
+    {
+        if (string.startsWith("/"+identifier+" "))
+        {
+            String[] res = string.split("\\s+", 3);
+            if (res.length == 3)
+            {
+                String setting = res[1];
+                String strOption = res[2];
+                if (rules.containsKey(setting) && rules.get(setting).isClient)
+                {
+                    rules.get(setting).set(source, strOption);
+                }
+            }
+        }
+    }
 }
