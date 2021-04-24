@@ -22,6 +22,7 @@
     "logger.tnt.EntityTntMixin",
     "protocol.CPacketCustomPayloadMixin",
     "protocol.EntityPlayerSPMixin",
+    "protocol.MinecraftMixin",
     "protocol.NetHandlerPlayClientMixin",
     "protocol.NetHandlerPlayServerMixin",
     "rotator.BlockDispenserMixin",

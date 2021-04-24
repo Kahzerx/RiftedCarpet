@@ -330,4 +330,30 @@ public class CarpetSettings {
             category = {CREATIVE, CLIENT}
     )
     public static boolean creativeNoClip = false;
+
+    public static class StructureBlockLimitValidator extends Validator<Integer> {
+
+        @Override public Integer validate(CommandSource source, ParsedRule<Integer> currentRule, Integer newValue, String string) {
+            return (newValue >= vanillaStructureBlockLimit) ? newValue : null;
+        }
+
+        @Override
+        public String description() {
+            return "You have to choose a value greater or equal to 48";
+        }
+    }
+    @Rule(
+            desc = "Customizable structure block limit of each axis",
+            extra = {"WARNING: Needs to be permanent for correct loading.",
+                    "Setting 'structureBlockIgnored' to air is recommended",
+                    "when saving massive structures.",
+                    "Required on client of player editing the Structure Block.",
+                    "'structureBlockOutlineDistance' may be required for",
+                    "correct rendering of long structures."},
+            options = {"48", "96", "192", "256"},
+            category = CREATIVE,
+            validate = StructureBlockLimitValidator.class,
+            strict = false
+    )
+    public static int structureBlockLimit = vanillaStructureBlockLimit;
 }

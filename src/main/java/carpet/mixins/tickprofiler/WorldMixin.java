@@ -50,6 +50,8 @@ public abstract class WorldMixin implements IEntityReader, IWorld, IWorldReader,
     public void tickEntity(World world, Entity ent) {
         if (TickSpeed.process_entities || ent instanceof EntityPlayer) {
             this.tickEntity(ent);
+        } else {
+            return;
         }
     }
 

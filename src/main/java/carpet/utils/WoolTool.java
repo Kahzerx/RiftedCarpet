@@ -44,9 +44,9 @@ public class WoolTool {
             case PINK:
                 if (!"false".equals(CarpetSettings.commandSpawn)) Messenger.send(placer, SpawnReporter.report(pos, worldIn));
                 break;
-            case BLACK:
-                if (!"false".equals(CarpetSettings.commandSpawn)) Messenger.send(placer, SpawnReporter.show_mobcaps(pos, worldIn));
-                break;
+//            case BLACK:
+//                if (!"false".equals(CarpetSettings.commandSpawn)) Messenger.send(placer, SpawnReporter.show_mobcaps(pos, worldIn));
+//                break;
             case BROWN:
                 if (!"false".equals(CarpetSettings.commandDistance))
                 {

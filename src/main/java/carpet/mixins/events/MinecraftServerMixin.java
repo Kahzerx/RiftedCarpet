@@ -1,7 +1,6 @@
 package carpet.mixins.events;
 
 import carpet.CarpetServer;
-import carpet.utils.CarpetProfiler;
 import com.google.gson.JsonElement;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.integrated.IntegratedServer;
