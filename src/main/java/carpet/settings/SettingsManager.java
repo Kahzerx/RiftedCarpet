@@ -54,6 +54,10 @@ public class SettingsManager
         this.fancyName = fancyName;
     }
 
+    public String getIdentifier() {
+        return identifier;
+    }
+
     void notifyRuleChanged(CommandSource source, ParsedRule<?> rule, String userTypedValue)
     {
         observers.forEach(observer -> observer.accept(source, rule, userTypedValue));

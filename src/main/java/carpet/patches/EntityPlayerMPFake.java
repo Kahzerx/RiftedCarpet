@@ -25,18 +25,15 @@ public class EntityPlayerMPFake extends EntityPlayerMP {
 
     public Runnable fixStartingPosition = () -> {};
 
-    public static EntityPlayerMPFake createFake(String username, MinecraftServer server, double d0, double d1, double d2, double yaw, double pitch, DimensionType dimension, GameType gamemode)
-    {
+    public static EntityPlayerMPFake createFake(String username, MinecraftServer server, double d0, double d1, double d2, double yaw, double pitch, DimensionType dimension, GameType gamemode) {
         //prolly half of that crap is not necessary, but it works
         WorldServer worldIn = server.getWorld(dimension);
         PlayerInteractionManager interactionManagerIn = new PlayerInteractionManager(worldIn);
         GameProfile gameprofile = server.getPlayerProfileCache().getGameProfileForUsername(username);
-        if (gameprofile == null)
-        {
+        if (gameprofile == null) {
             return null;
         }
-        if (gameprofile.getProperties().containsKey("textures"))
-        {
+        if (gameprofile.getProperties().containsKey("textures")) {
             gameprofile = TileEntitySkull.updateGameProfile(gameprofile);
         }
         EntityPlayerMPFake instance = new EntityPlayerMPFake(server, worldIn, gameprofile, interactionManagerIn);

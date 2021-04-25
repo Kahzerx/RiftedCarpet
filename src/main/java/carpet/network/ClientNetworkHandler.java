@@ -1,5 +1,6 @@
 package carpet.network;
 
+import carpet.CarpetExtension;
 import carpet.CarpetServer;
 import carpet.CarpetSettings;
 import carpet.helpers.TickSpeed;
@@ -20,12 +21,32 @@ public class ClientNetworkHandler {
     static {
         dataHandlers.put("Rules", (p, t) -> {
             NBTTagCompound ruleset = (NBTTagCompound) t;
-            for (String ruleName : ruleset.keySet()) {
-                ParsedRule<?> rule = CarpetServer.settingsManager.getRule(ruleName);
-                if (rule == null) {
-                    CarpetSettings.LOG.error("Received unknown rule: " + ruleName);
+            for (String ruleKey : ruleset.keySet()) {
+                NBTTagCompound ruleNBT = (NBTTagCompound) ruleset.get(ruleKey);
+                SettingsManager manager = null;
+                String ruleName;
+                if (ruleNBT.contains("Manager")) {
+                    ruleName = ruleNBT.getString("Rule");
+                    String managerName = ruleNBT.getString("Manager");
+                    if (managerName.equals("carpet")) {
+                        manager = CarpetServer.settingsManager;
+                    } else {
+                        for (CarpetExtension extension : CarpetServer.extensions) {
+                            SettingsManager eManager = extension.customSettingsManager();
+                            if (eManager != null && managerName.equals(eManager.getIdentifier())) {
+                                manager = eManager;
+                                break;
+                            }
+                        }
+                    }
                 } else {
-                    NBTTagCompound ruleNBT = (NBTTagCompound) ruleset.get(ruleName);
+                    manager = CarpetServer.settingsManager;
+                    ruleName = ruleKey;
+                }
+                ParsedRule<?> rule = (manager != null) ? manager.getRule(ruleName) : null;
+                if (rule == null) {
+                    CarpetSettings.LOG.error("Received unknown rule: " + ruleKey);
+                } else {
                     String value = ruleNBT.getString("Value");
                     rule.set(null, value);
                 }
@@ -63,14 +84,14 @@ public class ClientNetworkHandler {
                 CarpetSettings.LOG.warn("Joined carpet server with another carpet version: "+CarpetClient.serverCarpetVersion);
             }
 
-            if (CarpetClient.getPlayer() != null)
+            if (CarpetClient.getPlayer() != null) {
                 respondHello();
+            }
 
         }
     }
 
-    public static void respondHello()
-    {
+    public static void respondHello() {
         CarpetClient.getPlayer().connection.sendPacket(new CPacketCustomPayload(
                 CarpetClient.CARPET_CHANNEL,
                 (new PacketBuffer(Unpooled.buffer())).writeVarInt(CarpetClient.HELLO).writeString(CarpetSettings.carpetVersion)

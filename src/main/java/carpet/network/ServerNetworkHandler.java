@@ -22,13 +22,11 @@ import java.util.function.BiConsumer;
 
 public class ServerNetworkHandler {
 
-    private static Map<EntityPlayerMP, String> remoteCarpetPlayers = new HashMap<>();
-    private static Set<EntityPlayerMP> validCarpetPlayers = new HashSet<>();
+    private static final Map<EntityPlayerMP, String> remoteCarpetPlayers = new HashMap<>();
+    private static final Set<EntityPlayerMP> validCarpetPlayers = new HashSet<>();
 
-    private static Map<String, BiConsumer<EntityPlayerMP, INBTBase>> dataHandlers = new HashMap<String, BiConsumer<EntityPlayerMP, INBTBase>>(){{
-        put("clientCommand", (p, t) -> {
-            handleClientCommand(p, (NBTTagCompound)t);
-        });
+    private static final Map<String, BiConsumer<EntityPlayerMP, INBTBase>> dataHandlers = new HashMap<String, BiConsumer<EntityPlayerMP, INBTBase>>(){{
+        put("clientCommand", (p, t) -> handleClientCommand(p, (NBTTagCompound)t));
     }};
 
     public static void handleData(PacketBuffer data, EntityPlayerMP player) {
@@ -106,7 +104,7 @@ public class ServerNetworkHandler {
                     },
                     command
             );
-        };
+        }
         NBTTagCompound result = new NBTTagCompound();
         result.putString("id", id);
         result.putInt("code", resultCode);
