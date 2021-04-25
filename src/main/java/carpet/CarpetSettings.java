@@ -12,7 +12,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import static carpet.settings.RuleCategory.*;
-import static carpet.settings.RuleCategory.OPTIMIZATION;
 
 @SuppressWarnings("CanBeFinal")
 public class CarpetSettings {
@@ -52,6 +51,9 @@ public class CarpetSettings {
             category = BUGFIX
     )
     public static boolean portalSuffocationFix = false;
+
+    @Rule(desc = "Gbhs sgnf sadsgras fhskdpri!!!", category = EXPERIMENTAL)
+    public static boolean superSecretSetting = false;
 
     @Rule(
             desc = "Amount of delay ticks to use a nether portal in creative",

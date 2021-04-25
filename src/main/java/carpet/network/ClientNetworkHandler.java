@@ -7,9 +7,7 @@ import carpet.settings.ParsedRule;
 import carpet.settings.SettingsManager;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.nbt.INBTBase;
-import net.minecraft.nbt.NBTPrimitive;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.*;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.client.CPacketCustomPayload;
 
@@ -33,7 +31,11 @@ public class ClientNetworkHandler {
                 }
             }
         });
-        dataHandlers.put("TickRate", (p, t) -> TickSpeed.tickrate(((NBTPrimitive)t).getFloat()));
+        dataHandlers.put("TickRate", (p, t) -> TickSpeed.tickrate(((NBTPrimitive)t).getFloat(), false));
+        dataHandlers.put("TickingState", (p, t) -> {
+            NBTTagCompound tickingState = (NBTTagCompound)t;
+            TickSpeed.setFrozenState(tickingState.getBoolean("is_paused"), tickingState.getBoolean("deepFreeze"));
+        });
         dataHandlers.put("clientCommand", (p, t) -> {
             CarpetClient.onClientCommand(t);
         });

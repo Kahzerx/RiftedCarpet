@@ -4,6 +4,7 @@ import carpet.CarpetServer;
 import carpet.CarpetSettings;
 import carpet.helpers.TickSpeed;
 import carpet.settings.ParsedRule;
+import carpet.settings.SettingsManager;
 import io.netty.buffer.Unpooled;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -34,8 +35,12 @@ public class ServerNetworkHandler {
         if (data != null)
         {
             int id = data.readVarInt();
-            if (id == CarpetClient.HELLO) onHello(player, data);
-            if (id == CarpetClient.DATA) onClientData(player, data);
+            if (id == CarpetClient.HELLO) {
+                onHello(player, data);
+            }
+            if (id == CarpetClient.DATA) {
+                onClientData(player, data);
+            }
         }
     }
 
@@ -53,18 +58,7 @@ public class ServerNetworkHandler {
 
     }
 
-    public static void onPlayerLoggedOut(EntityPlayerMP player){
-        validCarpetPlayers.remove(player);
-        if (!player.connection.netManager.isLocalChannel()) remoteCarpetPlayers.remove(player);
-    }
-
-    public static void close() {
-        remoteCarpetPlayers.clear();
-        validCarpetPlayers.clear();
-    }
-
     public static void onHello(EntityPlayerMP playerEntity, PacketBuffer packetData) {
-
         validCarpetPlayers.add(playerEntity);
         String clientVersion = packetData.readString(64);
         remoteCarpetPlayers.put(playerEntity, clientVersion);
@@ -72,20 +66,15 @@ public class ServerNetworkHandler {
             CarpetSettings.LOG.info("Player "+playerEntity.getName().getString()+" joined with a matching carpet client");
         else
             CarpetSettings.LOG.warn("Player "+playerEntity.getName().getString()+" joined with another carpet version: "+clientVersion);
-        DataBuilder data = DataBuilder.create().withTickRate();
+        DataBuilder data = DataBuilder.create().withTickRate().withFrozenState().withTickPlayerActiveTimeout(); // .withSuperHotState()
         CarpetServer.settingsManager.getRules().forEach(data::withRule);
+        CarpetServer.extensions.forEach(e -> {
+            SettingsManager eManager = e.customSettingsManager();
+            if (eManager != null) {
+                eManager.getRules().forEach(data::withRule);
+            }
+        });
         playerEntity.connection.sendPacket(new CPacketCustomPayload(CarpetClient.CARPET_CHANNEL, data.build() ));
-    }
-
-    private static void onClientData(EntityPlayerMP player, PacketBuffer data) {
-        NBTTagCompound compound = data.readCompoundTag();
-        if (compound == null) return;
-        for (String key: compound.keySet()) {
-            if (dataHandlers.containsKey(key))
-                dataHandlers.get(key).accept(player, compound.get(key));
-            else
-                CarpetSettings.LOG.warn("Unknown carpet client data: "+key);
-        }
     }
 
     private static void handleClientCommand(EntityPlayerMP player, NBTTagCompound commandData) {
@@ -132,6 +121,77 @@ public class ServerNetworkHandler {
         // run command plug to command output,
     }
 
+    private static void onClientData(EntityPlayerMP player, PacketBuffer data) {
+        NBTTagCompound compound = data.readCompoundTag();
+        if (compound == null) return;
+        for (String key: compound.keySet()) {
+            if (dataHandlers.containsKey(key))
+                dataHandlers.get(key).accept(player, compound.get(key));
+            else
+                CarpetSettings.LOG.warn("Unknown carpet client data: "+key);
+        }
+    }
+
+    public static void updateRuleWithConnectedClients(ParsedRule<?> rule) {
+        if (CarpetSettings.superSecretSetting) return;
+        for (EntityPlayerMP player : remoteCarpetPlayers.keySet()) {
+            player.connection.sendPacket(new CPacketCustomPayload(
+                    CarpetClient.CARPET_CHANNEL,
+                    DataBuilder.create().withRule(rule).build()
+            ));
+        }
+    }
+
+    public static void updateTickSpeedToConnectedPlayers() {
+        if (CarpetSettings.superSecretSetting) return;
+        for (EntityPlayerMP player : remoteCarpetPlayers.keySet()) {
+            player.connection.sendPacket(new CPacketCustomPayload(
+                    CarpetClient.CARPET_CHANNEL,
+                    DataBuilder.create().withTickRate().build()
+            ));
+        }
+    }
+
+    public static void updateFrozenStateToConnectedPlayers() {
+        if (CarpetSettings.superSecretSetting) return;
+        for (EntityPlayerMP player : remoteCarpetPlayers.keySet()) {
+            player.connection.sendPacket(new CPacketCustomPayload(
+                    CarpetClient.CARPET_CHANNEL,
+                    DataBuilder.create().withFrozenState().build()
+            ));
+        }
+    }
+
+    public static void updateSuperHotStateToConnectedPlayers() {
+        if(CarpetSettings.superSecretSetting) return;
+        for (EntityPlayerMP player : remoteCarpetPlayers.keySet()) {
+            player.connection.sendPacket(new CPacketCustomPayload(
+                    CarpetClient.CARPET_CHANNEL,
+                    DataBuilder.create().withSuperHotState().build()
+            ));
+        }
+    }
+
+    public static void updateTickPlayerActiveTimeoutToConnectedPlayers() {
+        if (CarpetSettings.superSecretSetting) return;
+        for (EntityPlayerMP player : remoteCarpetPlayers.keySet()) {
+            player.connection.sendPacket(new CPacketCustomPayload(
+                    CarpetClient.CARPET_CHANNEL,
+                    DataBuilder.create().withTickPlayerActiveTimeout().build()
+            ));
+        }
+    }
+
+    public static void onPlayerLoggedOut(EntityPlayerMP player){
+        validCarpetPlayers.remove(player);
+        if (!player.connection.netManager.isLocalChannel()) remoteCarpetPlayers.remove(player);
+    }
+
+    public static void close() {
+        remoteCarpetPlayers.clear();
+        validCarpetPlayers.clear();
+    }
+
     private static class DataBuilder {
         private final NBTTagCompound tag;
 
@@ -146,6 +206,24 @@ public class ServerNetworkHandler {
 
         private DataBuilder withTickRate() {
             tag.putFloat("TickRate", TickSpeed.tickrate);
+            return this;
+        }
+
+        private DataBuilder withFrozenState() {
+            NBTTagCompound tickingState = new NBTTagCompound();
+            tickingState.putBoolean("is_paused", TickSpeed.isPaused());
+            tickingState.putBoolean("deepFreeze", TickSpeed.deeplyFrozen());
+            tag.put("TickingState", tickingState);
+            return this;
+        }
+
+        private DataBuilder withSuperHotState() {
+            tag.putBoolean("SuperHotState", TickSpeed.is_superHot);
+            return this;
+        }
+
+        private DataBuilder withTickPlayerActiveTimeout() {
+            tag.putInt("TickPlayerActiveTimeout", TickSpeed.player_active_timeout);
             return this;
         }
 

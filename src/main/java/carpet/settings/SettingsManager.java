@@ -1,6 +1,7 @@
 package carpet.settings;
 
 import carpet.CarpetSettings;
+import carpet.network.ServerNetworkHandler;
 import carpet.utils.Messenger;
 import carpet.utils.Translations;
 import com.google.common.collect.ImmutableList;
@@ -56,6 +57,7 @@ public class SettingsManager
     void notifyRuleChanged(CommandSource source, ParsedRule<?> rule, String userTypedValue)
     {
         observers.forEach(observer -> observer.accept(source, rule, userTypedValue));
+        ServerNetworkHandler.updateRuleWithConnectedClients(rule);
     }
 
     public void parseSettingsClass(Class settingsClass)
