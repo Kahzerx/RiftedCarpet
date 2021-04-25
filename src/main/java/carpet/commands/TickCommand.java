@@ -59,69 +59,54 @@ public class TickCommand {
         dispatcher.register(literalArgumentBuilder);
     }
 
-    private static int queryTps(CommandSource source)
-    {
+    private static int queryTps(CommandSource source) {
         Messenger.m(source, "w Current tps is: ",String.format("wb %.1f", TickSpeed.tickrate));
         return (int)TickSpeed.tickrate;
     }
 
-    private static int setTps(CommandSource source, float tps)
-    {
+    private static int setTps(CommandSource source, float tps) {
         TickSpeed.tickrate(tps);
         queryTps(source);
         return (int)tps;
     }
 
-    private static int setWarp(CommandSource source, int advance, String tail_command)
-    {
+    private static int setWarp(CommandSource source, int advance, String tail_command) {
         EntityPlayerMP player = null;
-        try
-        {
+        try {
             player = source.asPlayer();
-        }
-        catch (CommandSyntaxException ignored)
-        {
+        } catch (CommandSyntaxException ignored) {
         }
         ITextComponent message = TickSpeed.tickrate_advance(player, advance, tail_command, source);
-        if (message != null)
-        {
-            source.sendFeedback(message, false);
-        }
+        source.sendFeedback(message, false);
         return 1;
     }
 
     private static int toggleFreeze(CommandSource source, boolean isDeep)
     {
         TickSpeed.is_paused = !TickSpeed.is_paused;
-        if (TickSpeed.is_paused)
-        {
+        if (TickSpeed.is_paused) {
             TickSpeed.deepFreeze = isDeep;
             Messenger.m(source, "gi Game is "+(isDeep?"deeply ":"")+"frozen");
 
         }
-        else
-        {
+        else {
             TickSpeed.deepFreeze = false;
             Messenger.m(source, "gi Game runs normally");
         }
         return 1;
     }
 
-    private static int step(int advance)
-    {
+    private static int step(int advance) {
         TickSpeed.add_ticks_to_run_in_pause(advance);
         return 1;
     }
 
-    private static int toggleSuperHot(CommandSource source)
-    {
+    private static int toggleSuperHot(CommandSource source) {
         TickSpeed.is_superHot = !TickSpeed.is_superHot;
-        if (TickSpeed.is_superHot)
-        {
+        if (TickSpeed.is_superHot) {
             Messenger.m(source,"gi Superhot enabled");
         }
-        else
-        {
+        else {
             Messenger.m(source, "gi Superhot disabled");
         }
         return 1;

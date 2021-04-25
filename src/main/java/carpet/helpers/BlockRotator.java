@@ -37,7 +37,7 @@ public class BlockRotator {
         if ((block instanceof BlockGlazedTerracotta) || (block instanceof BlockRedstoneDiode) || (block instanceof BlockRailBase) || (block instanceof BlockTrapDoor) || (block instanceof BlockLever) || (block instanceof BlockFenceGate)) {
             worldIn.setBlockState(pos, block.rotate(state, Rotation.CLOCKWISE_90), 2 | 1024);
         } else if ((block instanceof BlockObserver) || (block instanceof BlockEndRod)) {
-            worldIn.setBlockState(pos, state.with(BlockDirectional.FACING, (EnumFacing)state.get(BlockDirectional.FACING).getOpposite()), 2 | 1024);
+            worldIn.setBlockState(pos, state.with(BlockDirectional.FACING, state.get(BlockDirectional.FACING).getOpposite()), 2 | 1024);
         } else if (block instanceof BlockDispenser) {
             worldIn.setBlockState(pos, state.with(BlockDispenser.FACING, state.get(BlockDispenser.FACING).getOpposite()), 2 | 1024);
         } else if (block instanceof BlockPistonBase) {
@@ -116,7 +116,7 @@ public class BlockRotator {
             if (block instanceof BlockBed) return stack;
             EnumFacing face = iBlockState.get(BlockHorizontal.HORIZONTAL_FACING);
             face = rotateClockwise(face, EnumFacing.Axis.Y);
-            if (sourceFace == EnumFacing.DOWN) face.getOpposite();
+            if (sourceFace == EnumFacing.DOWN) face = face.getOpposite();
             world.setBlockState(pos, iBlockState.with(BlockHorizontal.HORIZONTAL_FACING, face), 3);
         } else if (block == Blocks.HOPPER) {
             EnumFacing face = iBlockState.get(BlockHopper.FACING);

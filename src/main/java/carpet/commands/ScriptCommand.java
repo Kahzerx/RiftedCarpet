@@ -36,9 +36,7 @@ import static net.minecraft.command.Commands.argument;
 import static net.minecraft.command.Commands.literal;
 import static net.minecraft.command.ISuggestionProvider.suggest;
 
-public class ScriptCommand
-{
-
+public class ScriptCommand {
     private static CompletableFuture<Suggestions> suggestCode(
             CommandContext<CommandSource> context,
             SuggestionsBuilder suggestionsBuilder
@@ -71,7 +69,7 @@ public class ScriptCommand
                 executes( (cc) -> { CarpetServer.scriptServer.stopAll = false; return 1;});
         LiteralArgumentBuilder<CommandSource> l = literal("run").
                 requires((player) -> player.hasPermissionLevel(2)).
-                then(argument("expr", StringArgumentType.greedyString()).suggests((cc, bb) -> suggestCode(cc, bb)).
+                then(argument("expr", StringArgumentType.greedyString()).suggests(ScriptCommand::suggestCode).
                         executes((cc) -> compute(
                                 cc,
                                 StringArgumentType.getString(cc, "expr"))));
@@ -134,7 +132,7 @@ public class ScriptCommand
                         then(argument("from", BlockPosArgument.blockPos()).
                                 then(argument("to", BlockPosArgument.blockPos()).
                                         then(argument("expr", StringArgumentType.greedyString()).
-                                                suggests((cc, bb) -> suggestCode(cc, bb)).
+                                                suggests(ScriptCommand::suggestCode).
                                                 executes( (cc) -> scriptScan(
                                                         cc,
                                                         BlockPosArgument.getBlockPos(cc, "origin"),
@@ -257,35 +255,27 @@ public class ScriptCommand
                                 suggests( (cc, bb) -> suggest(CarpetServer.scriptServer.modules.keySet(), bb)).
                                 then(b).then(u).then(o).then(l).then(s).then(c).then(h).then(i).then(e).then(t))));
     }
-    private static ScriptHost getHost(CommandContext<CommandSource> context)
-    {
-        try
-        {
+    private static ScriptHost getHost(CommandContext<CommandSource> context) {
+        try {
             String name = StringArgumentType.getString(context, "package").toLowerCase(Locale.ROOT);
             return CarpetServer.scriptServer.modules.getOrDefault(name, CarpetServer.scriptServer.globalHost);
 
-        }
-        catch (IllegalArgumentException ignored)
-        {
+        } catch (IllegalArgumentException ignored) {
             return CarpetServer.scriptServer.globalHost;
         }
     }
-    private static Collection<String> suggestFunctionCalls(CommandContext<CommandSource> c)
-    {
-        CommandSource s = c.getSource();
+
+    private static Collection<String> suggestFunctionCalls(CommandContext<CommandSource> c) {
         ScriptHost host = getHost(c);
         return host.getPublicFunctions();
     }
-    private static int listEvents(CommandSource source)
-    {
+
+    private static int listEvents(CommandSource source) {
         Messenger.m(source, "w Lists ALL event handlers:");
-        for (String event: CarpetServer.scriptServer.events.eventHandlers.keySet())
-        {
+        for (String event: CarpetServer.scriptServer.events.eventHandlers.keySet()) {
             boolean shownEvent = false;
-            for (CarpetEventServer.Callback c: CarpetServer.scriptServer.events.eventHandlers.get(event).callList)
-            {
-                if (!shownEvent)
-                {
+            for (CarpetEventServer.Callback c: CarpetServer.scriptServer.events.eventHandlers.get(event).callList) {
+                if (!shownEvent) {
                     Messenger.m(source, "w Handlers for "+event+": ");
                     shownEvent = true;
                 }
@@ -294,20 +284,18 @@ public class ScriptCommand
         }
         return 1;
     }
-    private static int listGlobals(CommandContext<CommandSource> context)
-    {
+
+    private static int listGlobals(CommandContext<CommandSource> context) {
         ScriptHost host = getHost(context);
         CommandSource source = context.getSource();
 
         Messenger.m(source, "lb Stored functions"+((host == CarpetServer.scriptServer.globalHost)?":":" in "+host.getName()+":"));
-        for (String fname : host.getAvailableFunctions())
-        {
+        for (String fname : host.getAvailableFunctions()) {
             Expression expr = host.getExpressionForFunction(fname);
             Tokenizer.Token tok = host.getTokenForFunction(fname);
             List<String> snippet = ExpressionInspector.Expression_getExpressionSnippet(tok, expr);
             Messenger.m(source, "wb "+fname,"t  defined at: line "+(tok.lineno+1)+" pos "+(tok.linepos+1));
-            for (String snippetLine: snippet)
-            {
+            for (String snippetLine: snippet) {
                 Messenger.m(source, "w "+snippetLine);
             }
             Messenger.m(source, "gi ----------------");
@@ -373,8 +361,6 @@ public class ScriptCommand
             positions.add(pos2.getY());
             positions.add(pos2.getZ());
         }
-        //if (!(args.trim().isEmpty()))
-        //    arguments.addAll(Arrays.asList(args.trim().split("\\s+")));
         handleCall(source, () ->  host.call(source, call, positions, args));
         return 1;
     }
@@ -470,7 +456,7 @@ public class ScriptCommand
                         Messenger.m(source, "r Exception while filling the area:\n","l "+e.getMessage());
                         return 0;
                     }
-                    catch (ArithmeticException e)
+                    catch (ArithmeticException ignored)
                     {
                     }
                 }

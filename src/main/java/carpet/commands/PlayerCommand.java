@@ -2,11 +2,16 @@ package carpet.commands;
 
 import carpet.CarpetSettings;
 import carpet.fakes.EntityPlayerMPInterface;
+import carpet.helpers.EntityPlayerActionPack;
 import carpet.patches.EntityPlayerMPFake;
 import carpet.settings.SettingsManager;
 import carpet.utils.Messenger;
 import com.google.common.collect.Sets;
+import com.mojang.authlib.GameProfile;
+import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -17,14 +22,20 @@ import net.minecraft.command.arguments.Vec3Argument;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.management.PlayerList;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameType;
+import net.minecraft.world.World;
+import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.dimension.DimensionType;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.getString;
 import static com.mojang.brigadier.arguments.StringArgumentType.word;
@@ -40,99 +51,111 @@ public class PlayerCommand {
     LiteralArgumentBuilder<CommandSource> literalArgumentBuilder = literal("player").
             requires((player) -> SettingsManager.canUseCommand(player, CarpetSettings.commandPlayer)).
             then(argument("player", word()).
-                    suggests( (c, b) -> suggest(getPlayers(c.getSource()), b)).
-                    then(literal("stop").
-                            executes(PlayerCommand::stop)).
-                    then(literal("use").
-                            executes(PlayerCommand::useOnce).
-                            then(literal("once").
-                                    executes(PlayerCommand::useOnce)).
-                            then(literal("continuous").
-                                    executes(PlayerCommand::useContinuous)).
-                            then(literal("interval").
-                                    then(argument("ticks", integer(2)).
-                                            executes(PlayerCommand::useInterval)))).
-                    then(literal("jump").
-                            executes(PlayerCommand::jumpOnce).
-                            then(literal("once").
-                                    executes(PlayerCommand::jumpOnce)).
-                            then(literal("continuous").
-                                    executes(PlayerCommand::jumpContinuous)).
-                            then(literal("interval").
-                                    then(argument("ticks", integer(2)).
-                                            executes(PlayerCommand::jumpInterval)))).
-                    then(literal("attack").
-                            executes(PlayerCommand::attackOnce).
-                            then(literal("once").
-                                    executes(PlayerCommand::attackOnce)).
-                            then(literal("continuous").
-                                    executes(PlayerCommand::attackContinuous)).
-                            then(literal("interval").
-                                    then(argument("ticks",integer(2)).
-                                            executes(PlayerCommand::attackInterval)))).
-                    then(literal("drop").
-                            executes(PlayerCommand::dropItem)).
-                    then(literal("swapHands").
-                            executes(PlayerCommand::swapHands)).
-                    then(literal("kill").
-                            executes(PlayerCommand::kill)).
-                    then(literal("shadow").
-                            executes(PlayerCommand::shadow)).
-                    then(literal("mount").
-                            executes(PlayerCommand::mount)).
-                    then(literal("dismount").
-                            executes(PlayerCommand::dismount)).
-                    then(literal("sneak").
-                            executes(PlayerCommand::sneak)).
-                    then(literal("sprint").
-                            executes(PlayerCommand::sprint)).
+                    suggests((c, b) -> suggest(getPlayers(c.getSource()), b)).
+                    then(literal("stop").executes(PlayerCommand::stop)).
+                    then(makeActionCommand("use", EntityPlayerActionPack.ActionType.USE)).
+                    then(makeActionCommand("jump", EntityPlayerActionPack.ActionType.JUMP)).
+                    then(makeActionCommand("attack", EntityPlayerActionPack.ActionType.ATTACK)).
+                    then(makeActionCommand("drop", EntityPlayerActionPack.ActionType.DROP_ITEM)).
+                    then(makeDropCommand("drop", false)).
+                    then(makeActionCommand("dropStack", EntityPlayerActionPack.ActionType.DROP_STACK)).
+                    then(makeDropCommand("drop", true)).
+                    then(makeActionCommand("swapHands", EntityPlayerActionPack.ActionType.SWAP_HANDS)).
+                    then(literal("hotbar").
+                            then(argument("slot", integer(1, 9)).
+                                    executes(c -> manipulate(c, ap -> ap.setSlot(getInteger(c, "slot")))))).
+                    then(literal("kill").executes(PlayerCommand::kill)).
+                    then(literal("shadow").executes(PlayerCommand::shadow)).
+                    then(literal("mount").executes(manipulation(EntityPlayerActionPack::mount))).
+                    then(literal("dismount").executes(manipulation(EntityPlayerActionPack::dismount))).
+                    then(literal("sneak").executes(manipulation(ap -> ap.setSneaking(true)))).
+                    then(literal("unsneak").executes(manipulation(ap -> ap.setSneaking(false)))).
+                    then(literal("sprint").executes(manipulation(ap -> ap.setSprinting(true)))).
+                    then(literal("unsprint").executes(manipulation(ap -> ap.setSprinting(false)))).
                     then(literal("look").
-                            then(literal("north").
-                                    executes(PlayerCommand::lookNorth)).
-                            then(literal("south").
-                                    executes(PlayerCommand::lookSouth)).
-                            then(literal("east").
-                                    executes(PlayerCommand::lookEast)).
-                            then(literal("west").
-                                    executes(PlayerCommand::lookWest)).
-                            then(literal("up").
-                                    executes(PlayerCommand::lookUp)).
-                            then(literal("down").
-                                    executes(PlayerCommand::lookDown)).
-                            then(argument("direction", RotationArgument.rotation()).
-                                    executes(PlayerCommand::lookAround))).
-                    then(literal("turn").
-                            then(literal("left").
-                                    executes(PlayerCommand::turnLeft)).
-                            then(literal("right").
-                                    executes(PlayerCommand::turnRight)).
-                            then(literal("back").
-                                    executes(PlayerCommand::turnBack)).
-                            then(argument("direction",RotationArgument.rotation()).
-                                    executes(PlayerCommand::turn))).
-                    then(literal("move").
-                            then(literal("forward").
-                                    executes(PlayerCommand::moveForward)).
-                            then(literal("backward").
-                                    executes(PlayerCommand::moveBackward)).
-                            then(literal("left").
-                                    executes(PlayerCommand::strafeLeft)).
-                            then(literal("right").
-                                    executes(PlayerCommand::strafeRight))).
-                    then(literal("spawn").
-                            executes(PlayerCommand::spawn).
+                            then(literal("north").executes(manipulation(ap -> ap.look(EnumFacing.NORTH)))).
+                            then(literal("south").executes(manipulation(ap -> ap.look(EnumFacing.SOUTH)))).
+                            then(literal("east").executes(manipulation(ap -> ap.look(EnumFacing.EAST)))).
+                            then(literal("west").executes(manipulation(ap -> ap.look(EnumFacing.WEST)))).
+                            then(literal("up").executes(manipulation(ap -> ap.look(EnumFacing.UP)))).
+                            then(literal("down").executes(manipulation(ap -> ap.look(EnumFacing.DOWN)))).
                             then(literal("at").
-                                    then(argument("position", Vec3Argument.vec3()).
+                                    then(argument("position", Vec3Argument.vec3()).executes(PlayerCommand::lookAt))).
+                            then(argument("direction", RotationArgument.rotation()).
+                                    executes(c -> manipulate(c, ap -> ap.look(RotationArgument.getRotation(c, "direction").getRotation(c.getSource())))))).
+                    then(literal("turn").
+                            then(literal("left").executes(c -> manipulate(c, ap -> ap.turn(-90, 0)))).
+                            then(literal("right").executes(c -> manipulate(c, ap -> ap.turn(90, 0)))).
+                            then(literal("back").executes(c -> manipulate(c, ap -> ap.turn(180, 0)))).
+                            then(argument("rotation", RotationArgument.rotation()).
+                                    executes(c -> manipulate(c, ap -> ap.turn(RotationArgument.getRotation(c, "rotation").getRotation(c.getSource())))))).
+                    then(literal("move").executes(c -> manipulate(c, EntityPlayerActionPack::stopMovement)).
+                            then(literal("forward").executes(c -> manipulate(c, ap -> ap.setForward(1)))).
+                            then(literal("backward").executes(c -> manipulate(c, ap -> ap.setForward(-1)))).
+                            then(literal("left").executes(c -> manipulate(c, ap -> ap.setStrafing(1)))).
+                            then(literal("right").executes(c -> manipulate(c, ap -> ap.setStrafing(-1))))).
+                    then(literal("spawn").executes(PlayerCommand::spawn).
+                            then(literal("at").then(argument("position", Vec3Argument.vec3()).
+                                    executes(PlayerCommand::spawn).
+                                    then(literal("facing").then(argument("direction", RotationArgument.rotation()).
                                             executes(PlayerCommand::spawn).
-                                            then(literal("facing").
-                                                    then(argument("direction",RotationArgument.rotation()).
-                                                            executes(PlayerCommand::spawn).
-                                                            then(literal("in").
-                                                                    then(argument("dimension", DimensionArgument.getDimension()).
-                                                                            executes(PlayerCommand::spawn)))))))));
+                                            then(literal("in").then(argument("dimension", DimensionArgument.getDimension()).
+                                                    executes(PlayerCommand::spawn)))))))));
     dispatcher.register(literalArgumentBuilder);
     }
 
+    private static int stop(CommandContext<CommandSource> context) {
+        if (cantManipulate(context)) return 0;
+        EntityPlayerMP player = getPlayer(context);
+        ((EntityPlayerMPInterface) player).getActionPack().stopAll();
+        return 1;
+    }
+
+    private static LiteralArgumentBuilder<CommandSource> makeActionCommand(String actionName, EntityPlayerActionPack.ActionType type) {
+        return literal(actionName)
+                .executes(c -> action(c, type, EntityPlayerActionPack.Action.once()))
+                .then(literal("once").executes(c -> action(c, type, EntityPlayerActionPack.Action.once())))
+                .then(literal("continuous").executes(c -> action(c, type, EntityPlayerActionPack.Action.continuous())))
+                .then(literal("interval").then(argument("ticks", IntegerArgumentType.integer(1))
+                        .executes(c -> action(c, type, EntityPlayerActionPack.Action.interval(IntegerArgumentType.getInteger(c, "ticks"))))));
+    }
+
+    private static int action(CommandContext<CommandSource> context, EntityPlayerActionPack.ActionType type, EntityPlayerActionPack.Action action) {
+        return manipulate(context, ap -> ap.start(type, action));
+    }
+
+    private static int manipulate(CommandContext<CommandSource> context, Consumer<EntityPlayerActionPack> action) {
+        if (cantManipulate(context)) {
+            return 0;
+        }
+        EntityPlayerMP player = getPlayer(context);
+        action.accept(((EntityPlayerMPInterface) player).getActionPack());
+        return 1;
+    }
+
+    private static LiteralArgumentBuilder<CommandSource> makeDropCommand(String actionName, boolean dropAll) {
+        return literal(actionName)
+                .then(literal("all").executes(c ->manipulate(c, ap -> ap.drop(-2,dropAll))))
+                .then(literal("mainhand").executes(c ->manipulate(c, ap -> ap.drop(-1,dropAll))))
+                .then(literal("offhand").executes(c ->manipulate(c, ap -> ap.drop(40,dropAll))))
+                .then(argument("slot", IntegerArgumentType.integer(0, 40)).
+                        executes(c ->manipulate(c, ap -> ap.drop(
+                                IntegerArgumentType.getInteger(c,"slot"),
+                                dropAll
+                        ))));
+    }
+
+    private static Command<CommandSource> manipulation(Consumer<EntityPlayerActionPack> action) {
+        return c -> manipulate(c, action);
+    }
+
+    private static int lookAt(CommandContext<CommandSource> context) {
+        return manipulate(context, ap -> {
+            try {
+                ap.lookAt(Vec3Argument.getVec3(context, "position"));
+            } catch (CommandSyntaxException ignored) {}
+        });
+    }
 
     private static Collection<String> getPlayers(CommandSource source) {
         Set<String> players = Sets.newLinkedHashSet( Arrays.asList("Steve","Alex"));
@@ -146,14 +169,57 @@ public class PlayerCommand {
         return server.getPlayerList().getPlayerByUsername(playerName);
     }
 
-    private static boolean cantSpawn(CommandContext<CommandSource> context) {
-        String playerName = getString(context,"player");
-        EntityPlayer player = context.getSource().getServer().getPlayerList().getPlayerByUsername(playerName);
+    private static boolean cantSpawn(CommandContext<CommandSource> context)
+    {
+        String playerName = StringArgumentType.getString(context, "player");
+        MinecraftServer server = context.getSource().getServer();
+        PlayerList manager = server.getPlayerList();
+        EntityPlayer player = manager.getPlayerByUsername(playerName);
         if (player != null) {
-            Messenger.m(context.getSource(), "r Player ", "rb "+playerName, "r is already logged on");
+            Messenger.m(context.getSource(), "r Player ", "rb " + playerName, "r  is already logged on");
+            return true;
+        }
+        GameProfile profile = server.getPlayerProfileCache().getGameProfileForUsername(playerName);
+        if (profile == null) {
+            Messenger.m(context.getSource(), "r Player "+playerName+" is either banned by Mojang, or auth servers are down. " +
+                    "Banned players can only be summoned in Singleplayer and in servers in off-line mode.");
+            return true;
+        }
+        if (manager.getBannedPlayers().isBanned(profile)) {
+            Messenger.m(context.getSource(), "r Player ", "rb " + playerName, "r  is banned on this server");
+            return true;
+        }
+        if (manager.isWhiteListEnabled() && manager.getWhitelistedPlayers().isWhitelisted(profile) && !context.getSource().hasPermissionLevel(2)) {
+            Messenger.m(context.getSource(), "r Whitelisted players can only be spawned by operators");
             return true;
         }
         return false;
+    }
+
+    private static boolean cantReMove(CommandContext<CommandSource> context) {
+        if (cantManipulate(context)) return true;
+        EntityPlayer player = getPlayer(context);
+        if (player instanceof EntityPlayerMPFake) return false;
+        Messenger.m(context.getSource(), "r Only fake players can be moved or killed");
+        return true;
+    }
+
+    @FunctionalInterface
+    interface SupplierWithCommandSyntaxException<T>
+    {
+        T get() throws CommandSyntaxException;
+    }
+
+    private static <T> T tryGetArg(SupplierWithCommandSyntaxException<T> a, SupplierWithCommandSyntaxException<T> b) throws CommandSyntaxException
+    {
+        try
+        {
+            return a.get();
+        }
+        catch (IllegalArgumentException e)
+        {
+            return b.get();
+        }
     }
 
     private static boolean cantManipulate(CommandContext<CommandSource> context) {
@@ -179,116 +245,6 @@ public class PlayerCommand {
         return false;
     }
 
-    private static boolean cantShadow(CommandContext<CommandSource> context) {
-        if (cantManipulate(context)) return true;
-        EntityPlayer player = getPlayer(context);
-        if (player instanceof EntityPlayerMPFake) {
-            Messenger.m(context.getSource(), "r Only real players can be shadowed");
-            return true;
-        }
-        return false;
-    }
-
-    private static boolean cantReMove(CommandContext<CommandSource> context) {
-        if (cantManipulate(context))
-            return true;
-        EntityPlayer player = getPlayer(context);
-        if (!(player instanceof EntityPlayerMPFake)) {
-            Messenger.m(context.getSource(), "r Only fake players can be moved or killed");
-            return true;
-        }
-        return false;
-    }
-
-    private static int stop(CommandContext<CommandSource> context) {
-        if (cantManipulate(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        ((EntityPlayerMPInterface)player).getActionPack().stop();
-        return 1;
-    }
-
-    private static int useOnce(CommandContext<CommandSource> context) {
-        if (cantManipulate(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        ((EntityPlayerMPInterface)player).getActionPack().useOnce();
-        return 1;
-    }
-
-    private static int useContinuous(CommandContext<CommandSource> context) {
-        if (cantManipulate(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        ((EntityPlayerMPInterface)player).getActionPack().setUseForever();
-        return 1;
-    }
-
-    private static int useInterval(CommandContext<CommandSource> context) {
-        if (cantManipulate(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        int ticks = getInteger(context, "ticks");
-        ((EntityPlayerMPInterface)player).getActionPack().setUse(ticks, 0);
-        return 1;
-    }
-
-    private static int jumpOnce(CommandContext<CommandSource> context) {
-        if (cantManipulate(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        ((EntityPlayerMPInterface)player).getActionPack().jumpOnce();
-        return 1;
-    }
-
-    private static int jumpContinuous(CommandContext<CommandSource> context) {
-        if (cantManipulate(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        ((EntityPlayerMPInterface)player).getActionPack().setJumpForever();
-        return 1;
-    }
-
-    private static int jumpInterval(CommandContext<CommandSource> context) {
-        if (cantManipulate(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        int ticks = getInteger(context, "ticks");
-        ((EntityPlayerMPInterface)player).getActionPack().setJump(ticks, 0);
-        return 1;
-    }
-
-    private static int attackOnce(CommandContext<CommandSource> context) {
-        if (cantManipulate(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        ((EntityPlayerMPInterface)player).getActionPack().attackOnce();
-        ((EntityPlayerMPInterface)player).getActionPack().resetBlockRemoving(true);
-
-        return 1;
-    }
-
-    private static int attackContinuous(CommandContext<CommandSource> context) {
-        if (cantManipulate(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        ((EntityPlayerMPInterface)player).getActionPack().setAttackForever();
-        return 1;
-    }
-
-    private static int attackInterval(CommandContext<CommandSource> context) {
-        if (cantManipulate(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        int ticks = getInteger(context, "ticks");
-        ((EntityPlayerMPInterface)player).getActionPack().setAttack(ticks, 0);
-        return 1;
-    }
-
-    private static int dropItem(CommandContext<CommandSource> context) {
-        if (cantManipulate(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        ((EntityPlayerMPInterface)player).getActionPack().dropItem();
-        return 1;
-    }
-
-    private static int swapHands(CommandContext<CommandSource> context) {
-        if (cantManipulate(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        ((EntityPlayerMPInterface)player).getActionPack().swapHands();
-        return 1;
-    }
-
     private static int kill(CommandContext<CommandSource> context) {
         if (cantReMove(context)) return 0;
         getPlayer(context).onKillCommand();
@@ -296,187 +252,60 @@ public class PlayerCommand {
     }
 
     private static int shadow(CommandContext<CommandSource> context) {
-        if (cantShadow(context)) return 0;
-        EntityPlayerMPFake.createShadow(
-                context.getSource().getServer(),
-                getPlayer(context));
-        return 1;
-    }
-
-    private static int mount(CommandContext<CommandSource> context) {
-        if (cantManipulate(context)) return 0;
         EntityPlayerMP player = getPlayer(context);
-        ((EntityPlayerMPInterface)player).getActionPack().mount();
+        if (player instanceof EntityPlayerMPFake) {
+            Messenger.m(context.getSource(), "r Cannot shadow fake players");
+            return 0;
+        }
+        EntityPlayerMP sendingPlayer = null;
+        try {
+            sendingPlayer = context.getSource().asPlayer();
+        } catch (CommandSyntaxException ignored) { }
+
+        if (sendingPlayer != player && cantManipulate(context)) return 0;
+        EntityPlayerMPFake.createShadow(player.server, player);
         return 1;
     }
 
-    private static int dismount(CommandContext<CommandSource> context) {
-        if (cantManipulate(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        ((EntityPlayerMPInterface)player).getActionPack().dismount();
-        return 1;
-    }
-
-    private static int sneak(CommandContext<CommandSource> context) {
-        if (cantReMove(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        ((EntityPlayerMPInterface)player).getActionPack().setSneaking(true);
-        return 1;
-    }
-
-    private static int sprint(CommandContext<CommandSource> context) {
-        if (cantReMove(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        ((EntityPlayerMPInterface)player).getActionPack().setSprinting(true);
-        return 1;
-    }
-
-    private static int lookNorth(CommandContext<CommandSource> context) {
-        if (cantReMove(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        ((EntityPlayerMPInterface)player).getActionPack().look("north");
-        return 1;
-    }
-
-    private static int lookSouth(CommandContext<CommandSource> context) {
-        if (cantReMove(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        ((EntityPlayerMPInterface)player).getActionPack().look("south");
-        return 1;
-    }
-
-    private static int lookEast(CommandContext<CommandSource> context) {
-        if (cantReMove(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        ((EntityPlayerMPInterface)player).getActionPack().look("east");
-        return 1;
-    }
-
-    private static int lookWest(CommandContext<CommandSource> context) {
-        if (cantReMove(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        ((EntityPlayerMPInterface)player).getActionPack().look("west");
-        return 1;
-    }
-
-    private static int lookUp(CommandContext<CommandSource> context) {
-        if (cantReMove(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        ((EntityPlayerMPInterface)player).getActionPack().look("up");
-        return 1;
-    }
-
-    private static int lookDown(CommandContext<CommandSource> context) {
-        if (cantReMove(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        ((EntityPlayerMPInterface)player).getActionPack().look("down");
-        return 1;
-    }
-
-    private static int lookAround(CommandContext<CommandSource> context) {
-        if (cantReMove(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        Vec2f vec2f = RotationArgument.getRotation(context, "direction").getRotation(context.getSource());
-        ((EntityPlayerMPInterface)player).getActionPack().look(vec2f.y, vec2f.x);
-        return 1;
-    }
-
-    private static int turnRight(CommandContext<CommandSource> context) {
-        if (cantReMove(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        ((EntityPlayerMPInterface)player).getActionPack().turn("right");
-        return 1;
-    }
-
-    private static int turnLeft(CommandContext<CommandSource> context) {
-        if (cantReMove(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        ((EntityPlayerMPInterface)player).getActionPack().turn("left");
-        return 1;
-    }
-
-    private static int turnBack(CommandContext<CommandSource> context) {
-        if (cantReMove(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        ((EntityPlayerMPInterface)player).getActionPack().turn("back");
-        return 1;
-    }
-
-    private static int turn(CommandContext<CommandSource> context) {
-        if (cantReMove(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        Vec2f vec2f = RotationArgument.getRotation(context, "direction").getRotation(context.getSource());
-        ((EntityPlayerMPInterface)player).getActionPack().turn(vec2f.y,vec2f.x);
-        return 1;
-    }
-
-    private static int moveForward(CommandContext<CommandSource> context) {
-        if (cantReMove(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        ((EntityPlayerMPInterface)player).getActionPack().setForward(1.0F);
-        return 1;
-    }
-
-    private static int moveBackward(CommandContext<CommandSource> context) {
-        if (cantReMove(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        ((EntityPlayerMPInterface)player).getActionPack().setForward(-1.0F);
-        return 1;
-    }
-
-    private static int strafeLeft(CommandContext<CommandSource> context) {
-        if (cantReMove(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        ((EntityPlayerMPInterface)player).getActionPack().setStrafing(-1.0F);
-        return 1;
-    }
-
-    private static int strafeRight(CommandContext<CommandSource> context) {
-        if (cantReMove(context)) return 0;
-        EntityPlayerMP player = getPlayer(context);
-        ((EntityPlayerMPInterface)player).getActionPack().setStrafing(1.0F);
-        return 1;
-    }
-
-    private static int spawn(CommandContext<CommandSource> context) throws CommandSyntaxException {
+    private static int spawn(CommandContext<CommandSource> context) throws CommandSyntaxException
+    {
         if (cantSpawn(context)) return 0;
-        Vec3d pos;
-        Vec2f facing;
-        DimensionType dim;
-        try {
-            pos = Vec3Argument.getVec3(context, "position");
-        }
-        catch (IllegalArgumentException e) {
-            pos = context.getSource().getPos();
-        }
-        try {
-            facing = RotationArgument.getRotation(context, "direction").getRotation(context.getSource());
-        }
-        catch (IllegalArgumentException e) {
-            facing = context.getSource().getRotation();
-        }
-        try {
-            dim = DimensionArgument.func_212592_a(context, "dimension");
-        }
-        catch (IllegalArgumentException e) {
-            dim = context.getSource().getWorld().dimension.getType();
-        }
+        CommandSource source = context.getSource();
+        Vec3d pos = tryGetArg(
+                () -> Vec3Argument.getVec3(context, "position"),
+                source::getPos
+        );
+        Vec2f facing = tryGetArg(
+                () -> RotationArgument.getRotation(context, "direction").getRotation(context.getSource()),
+                source::getRotation
+        );
+
+        DimensionType dimType = tryGetArg(
+                () -> DimensionArgument.func_212592_a(context, "dimension"),
+                () -> source.getWorld().getDimension().getType()
+        );
+
         GameType mode = GameType.CREATIVE;
         try {
             EntityPlayerMP player = context.getSource().asPlayer();
             mode = player.interactionManager.getGameType();
+        } catch (CommandSyntaxException ignored) {}
+        String playerName = StringArgumentType.getString(context, "player");
+        if (playerName.length()>40) {
+            Messenger.m(context.getSource(), "rb Player name: "+playerName+" is too long");
+            return 0;
         }
-        catch (CommandSyntaxException ignored) { }
-        EntityPlayer p = EntityPlayerMPFake.createFake(
-                getString(context,"player"),
-                context.getSource().getServer(),
-                pos.x, pos.y, pos.z,
-                facing.y, facing.x,
-                dim,
-                mode);
-        if (p == null) {
-            Messenger.m(context.getSource(), "rb Player "+getString(context,"player")+" doesn't exist " +
+
+        MinecraftServer server = source.getServer();
+        if (!World.isValid(new BlockPos(pos.x, pos.y, pos.z))) {
+            Messenger.m(context.getSource(), "rb Player "+playerName+" cannot be placed outside of the world");
+            return 0;
+        }
+        EntityPlayer player = EntityPlayerMPFake.createFake(playerName, server, pos.x, pos.y, pos.z, facing.y, facing.x, dimType, mode);
+        if (player == null) {
+            Messenger.m(context.getSource(), "rb Player " + StringArgumentType.getString(context, "player") + " doesn't exist " +
                     "and cannot spawn in online mode. Turn the server offline to spawn non-existing players");
+            return 0;
         }
         return 1;
     }
