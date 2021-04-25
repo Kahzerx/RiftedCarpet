@@ -16,7 +16,7 @@ import static net.minecraft.command.Commands.argument;
 import static net.minecraft.command.Commands.literal;
 
 public class CameraModeCommand {
-    public static void register(CommandDispatcher<CommandSource> dispatcher){
+    public static void register(CommandDispatcher<CommandSource> dispatcher) {
         LiteralArgumentBuilder<CommandSource> camera = literal("c").
                 requires((player) -> SettingsManager.canUseCommand(player, CarpetSettings.commandCameramode)).
                 executes((c) -> cameraMode(c.getSource(), c.getSource().asPlayer())).

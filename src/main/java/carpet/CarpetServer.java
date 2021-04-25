@@ -86,6 +86,8 @@ public class CarpetServer {
         DrawCommand.register(dispatcher);
         DistanceCommand.register(dispatcher);
         PlayerCommand.register(dispatcher);
+        PingCommand.register(dispatcher);
+        ProfileCommand.register(dispatcher);
         ScriptCommand.register(dispatcher);
         InfoCommand.register(dispatcher);
         PerimeterInfoCommand.register(dispatcher);

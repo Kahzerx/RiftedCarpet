@@ -115,9 +115,9 @@ public class LoggerRegistry {
 
     private static Set<String> seenPlayers = new HashSet<>();
 
-    public static void playerConnected(EntityPlayer player){
+    public static void playerConnected(EntityPlayer player) {
         boolean firstTime = false;
-        if (!seenPlayers.contains(player.getName().getString())){
+        if (!seenPlayers.contains(player.getName().getString())) {
             seenPlayers.add(player.getName().getString());
             firstTime = true;
         }
@@ -126,10 +126,8 @@ public class LoggerRegistry {
         }
     }
 
-    public static void playerDisconnected(EntityPlayer player)
-    {
-        for(Logger log: loggerRegistry.values() )
-        {
+    public static void playerDisconnected(EntityPlayer player) {
+        for(Logger log: loggerRegistry.values() ) {
             log.onPlayerDisconnect(player);
         }
     }

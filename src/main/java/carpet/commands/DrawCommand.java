@@ -33,8 +33,7 @@ import static net.minecraft.command.Commands.literal;
 import static net.minecraft.command.ISuggestionProvider.suggest;
 
 public class DrawCommand {
-    public static void register(CommandDispatcher<CommandSource> dispatcher)
-    {
+    public static void register(CommandDispatcher<CommandSource> dispatcher) {
         LiteralArgumentBuilder<CommandSource> command = literal("draw").
                 requires((player) -> SettingsManager.canUseCommand(player, CarpetSettings.commandDraw)).
                 then(literal("sphere").
@@ -89,7 +88,7 @@ public class DrawCommand {
         T apply(final CommandContext<CommandSource> ctx, final String argName) throws CommandSyntaxException;
     }
 
-    private static RequiredArgumentBuilder<CommandSource, BlockStateInput> drawShape(OptionalBlockSelector drawer){
+    private static RequiredArgumentBuilder<CommandSource, BlockStateInput> drawShape(OptionalBlockSelector drawer) {
         return argument("block", BlockStateArgument.blockState()).
                 executes(drawer::apply).
                 then(literal("replace").

@@ -1,5 +1,6 @@
 package carpet.utils;
 
+import carpet.CarpetServer;
 import carpet.helpers.HopperCounter;
 import carpet.helpers.TickSpeed;
 import carpet.logging.LoggerRegistry;
@@ -22,12 +23,9 @@ public class HUDController {
 
     public static void addMessage(EntityPlayer player, ITextComponent hudMessage)
     {
-        if (!player_huds.containsKey(player))
-        {
+        if (!player_huds.containsKey(player)) {
             player_huds.put(player, new ArrayList<>());
-        }
-        else
-        {
+        } else {
             player_huds.get(player).add(new TextComponentString("\n"));
         }
         player_huds.get(player).add(hudMessage);
@@ -41,14 +39,17 @@ public class HUDController {
     }
 
     public static void update_hud(MinecraftServer server) {
-        if(server.getTickCounter() % 20 != 0)
+        if (server.getTickCounter() % 20 != 0 || CarpetServer.minecraft_server == null) {
             return;
+        }
 
         player_huds.clear();
 
-        if (LoggerRegistry.__tps) LoggerRegistry.getLogger("tps").log(()-> send_tps_display(server));
+        if (LoggerRegistry.__tps) {
+            LoggerRegistry.getLogger("tps").log(()-> send_tps_display(server));
+        }
 
-        if (LoggerRegistry.__mobcaps)
+        if (LoggerRegistry.__mobcaps) {
             LoggerRegistry.getLogger("mobcaps").log((option, player) -> {
                 int dim = player.dimension.getId();
                 switch (option)
@@ -65,10 +66,15 @@ public class HUDController {
                 }
                 return send_mobcap_display(dim);
             });
+        }
 
-        if (LoggerRegistry.__counter) LoggerRegistry.getLogger("counter").log((option) -> send_counter_info(server, option));
+        if (LoggerRegistry.__counter) {
+            LoggerRegistry.getLogger("counter").log((option) -> send_counter_info(server, option));
+        }
 
-        if (LoggerRegistry.__packets) LoggerRegistry.getLogger("packets").log(()-> packetCounter());
+        if (LoggerRegistry.__packets) {
+            LoggerRegistry.getLogger("packets").log(()-> packetCounter());
+        }
 
         for (EntityPlayer player: player_huds.keySet()) {
             SPacketPlayerListHeaderFooter packet = new SPacketPlayerListHeaderFooter();

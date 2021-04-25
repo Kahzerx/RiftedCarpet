@@ -26,21 +26,33 @@ import static net.minecraft.command.Commands.argument;
 import static net.minecraft.command.Commands.literal;
 
 public class InfoCommand {
-    public static void register(CommandDispatcher<CommandSource> dispatcher){
+    public static void register(CommandDispatcher<CommandSource> dispatcher) {
         LiteralArgumentBuilder<CommandSource> command = literal("info").
                 requires((player) -> SettingsManager.canUseCommand(player, CarpetSettings.commandInfo)).
                 then(literal("block").
                         then(argument("block position", BlockPosArgument.blockPos()).
-                                executes((c) -> infoBlock(c.getSource(), BlockPosArgument.getBlockPos(c, "block position"), null)).
+                                executes((c) -> infoBlock(
+                                        c.getSource(),
+                                        BlockPosArgument.getBlockPos(c, "block position"),
+                                        null)).
                                 then(literal("grep").
                                         then(argument("regexp", greedyString()).
-                                                executes((c) -> infoBlock(c.getSource(), BlockPosArgument.getBlockPos(c, "block position"), getString(c, "regexp"))))))).
+                                                executes((c) -> infoBlock(
+                                                        c.getSource(),
+                                                        BlockPosArgument.getBlockPos(c, "block position"),
+                                                        getString(c, "regexp"))))))).
                 then(literal("entity").
                         then(argument("entity selector", EntityArgument.entities()).
-                                executes((c) -> infoEntities(c.getSource(), EntityArgument.getEntities(c, "entity selector"), null)).
+                                executes((c) -> infoEntities(
+                                        c.getSource(),
+                                        EntityArgument.getEntities(c, "entity selector"),
+                                        null)).
                                 then(literal("grep").
                                         then(argument("regexp", greedyString()).
-                                                executes((c) -> infoEntities(c.getSource(), EntityArgument.getEntities(c, "entity selector"), getString(c, "regexp")))))));
+                                                executes((c) -> infoEntities(
+                                                        c.getSource(),
+                                                        EntityArgument.getEntities(c, "entity selector"),
+                                                        getString(c, "regexp")))))));
         dispatcher.register(command);
     }
 

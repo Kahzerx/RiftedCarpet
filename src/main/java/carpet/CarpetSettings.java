@@ -169,6 +169,13 @@ public class CarpetSettings {
             category = COMMAND)
     public static String commandSpawn = "false";
 
+    @Rule(
+            desc = "Enables /profile command to monitor game performance",
+            extra = "subset of /tick command capabilities",
+            category = COMMAND
+    )
+    public static String commandProfile = "true";
+
     @Rule(desc = "Enables /tick command to control game clocks", category = COMMAND)
     public static String commandTick = "true";
 
@@ -226,6 +233,9 @@ public class CarpetSettings {
 
     @Rule(desc = "Enables /player command to control/spawn players", category = COMMAND)
     public static String commandPlayer = "true";
+
+    @Rule(desc = "Enables /ping command to see your ping", category = COMMAND)
+    public static String commandPing = "true";
 
     @Rule(desc = "Placing carpets may issue carpet commands for non-op players", category = SURVIVAL)
     public static boolean carpets = false;
@@ -330,30 +340,4 @@ public class CarpetSettings {
             category = {CREATIVE, CLIENT}
     )
     public static boolean creativeNoClip = false;
-
-    public static class StructureBlockLimitValidator extends Validator<Integer> {
-
-        @Override public Integer validate(CommandSource source, ParsedRule<Integer> currentRule, Integer newValue, String string) {
-            return (newValue >= vanillaStructureBlockLimit) ? newValue : null;
-        }
-
-        @Override
-        public String description() {
-            return "You have to choose a value greater or equal to 48";
-        }
-    }
-    @Rule(
-            desc = "Customizable structure block limit of each axis",
-            extra = {"WARNING: Needs to be permanent for correct loading.",
-                    "Setting 'structureBlockIgnored' to air is recommended",
-                    "when saving massive structures.",
-                    "Required on client of player editing the Structure Block.",
-                    "'structureBlockOutlineDistance' may be required for",
-                    "correct rendering of long structures."},
-            options = {"48", "96", "192", "256"},
-            category = CREATIVE,
-            validate = StructureBlockLimitValidator.class,
-            strict = false
-    )
-    public static int structureBlockLimit = vanillaStructureBlockLimit;
 }

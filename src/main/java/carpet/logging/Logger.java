@@ -160,12 +160,10 @@ public class Logger {
         LoggerRegistry.setAccess(this);
     }
 
-    public void onPlayerDisconnect(EntityPlayer player)
-    {
+    public void onPlayerDisconnect(EntityPlayer player) {
         // If the player was subscribed to the log, move them to the set of offline subscribers.
         String playerName = player.getName().getString();
-        if (subscribedOnlinePlayers.containsKey(playerName))
-        {
+        if (subscribedOnlinePlayers.containsKey(playerName)) {
             subscribedOfflinePlayers.put(playerName, subscribedOnlinePlayers.get(playerName));
             subscribedOnlinePlayers.remove(playerName);
         }

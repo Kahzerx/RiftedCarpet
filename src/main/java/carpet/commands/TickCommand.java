@@ -127,13 +127,13 @@ public class TickCommand {
         return 1;
     }
 
-    private static int healthReport(CommandSource source, int ticks)
+    public static int healthReport(CommandSource source, int ticks)
     {
         CarpetProfiler.prepare_tick_report(ticks);
         return 1;
     }
 
-    private static int healthEntities(CommandSource source, int ticks)
+    public static int healthEntities(CommandSource source, int ticks)
     {
         CarpetProfiler.prepare_entity_report(ticks);
         return 1;

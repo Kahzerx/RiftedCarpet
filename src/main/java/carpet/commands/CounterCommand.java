@@ -13,7 +13,7 @@ import net.minecraft.util.text.ITextComponent;
 import static net.minecraft.command.Commands.literal;
 
 public class CounterCommand {
-    public static void register(CommandDispatcher<CommandSource> dispatcher){
+    public static void register(CommandDispatcher<CommandSource> dispatcher) {
         LiteralArgumentBuilder<CommandSource> literalArgumentBuilder = literal("counter").
                 executes((context) -> listAllCounters(context.getSource(), false)).
                 requires((player) -> CarpetSettings.hopperCounters);
@@ -21,7 +21,7 @@ public class CounterCommand {
         literalArgumentBuilder.
                 then((literal("reset").
                         executes((context) -> resetCounter(context.getSource(), null))));
-        for (EnumDyeColor enumDyeColor : EnumDyeColor.values()){
+        for (EnumDyeColor enumDyeColor : EnumDyeColor.values()) {
             String color = enumDyeColor.toString();
             literalArgumentBuilder.
                     then((literal(color).
@@ -38,24 +38,18 @@ public class CounterCommand {
         dispatcher.register(literalArgumentBuilder);
     }
 
-    private static int listAllCounters(CommandSource source, boolean realtime)
-    {
-        for (ITextComponent message: HopperCounter.formatAll(source.getServer(), realtime))
-        {
+    private static int listAllCounters(CommandSource source, boolean realtime) {
+        for (ITextComponent message: HopperCounter.formatAll(source.getServer(), realtime)) {
             source.sendFeedback(message, false);
         }
         return 1;
     }
 
-    private static int resetCounter(CommandSource source, String color)
-    {
-        if (color == null)
-        {
+    private static int resetCounter(CommandSource source, String color) {
+        if (color == null) {
             HopperCounter.resetAll(source.getServer());
             Messenger.m(source, "w Restarted all counters");
-        }
-        else
-        {
+        } else {
             HopperCounter counter = HopperCounter.getCounter(color);
             if (counter == null) throw new CommandException(Messenger.s("Unknown wool color"));
             counter.reset(source.getServer());
@@ -69,8 +63,7 @@ public class CounterCommand {
         HopperCounter counter = HopperCounter.getCounter(color);
         if (counter == null) throw new CommandException(Messenger.s("Unknown wool color: "+color));
 
-        for (ITextComponent message: counter.format(source.getServer(), realtime, false))
-        {
+        for (ITextComponent message: counter.format(source.getServer(), realtime, false)) {
             source.sendFeedback(message, false);
         }
         return 1;
