@@ -1,9 +1,11 @@
 package carpet.patches;
 
 import carpet.fakes.EntityPlayerMPInterface;
+import carpet.utils.Messenger;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.EnumPacketDirection;
 import net.minecraft.network.play.server.SPacketEntityHeadLook;
 import net.minecraft.network.play.server.SPacketEntityTeleport;
@@ -12,6 +14,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerInteractionManager;
 import net.minecraft.tileentity.TileEntitySkull;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.GameType;
 import net.minecraft.world.WorldServer;
@@ -86,11 +89,16 @@ public class EntityPlayerMPFake extends EntityPlayerMP {
     }
 
     @Override
-    public void onKillCommand()
-    {
-        //super.onKillCommand();
-        //check for 1.14compatibility
+    protected void playEquipSound(ItemStack p_playEquipSound_1_) {
+        if (!isHandActive()) {
+            super.playEquipSound(p_playEquipSound_1_);
+        }
+    }
+
+    @Override
+    public void onKillCommand() {
         this.getServer().addScheduledTask( () -> this.getServer().getPlayerList().playerLoggedOut(this) );
+
     }
 
     @Override
@@ -106,10 +114,10 @@ public class EntityPlayerMPFake extends EntityPlayerMP {
     }
 
     @Override
-    public void onDeath(DamageSource cause)
-    {
+    public void onDeath(DamageSource cause) {
         //check for 1.14 compatibility
         super.onDeath(cause);
+        setHealth(20);
         this.getServer().addScheduledTask( () -> this.getServer().getPlayerList().playerLoggedOut(this) );
     }
 
@@ -118,5 +126,10 @@ public class EntityPlayerMPFake extends EntityPlayerMP {
         Entity res = super.func_212321_a(p_212321_1_);
         this.getServer().addScheduledTask(() -> clearInvulnerableDimensionChange());
         return res;
+    }
+
+    @Override
+    public String getPlayerIP() {
+        return "127.0.0.1";
     }
 }

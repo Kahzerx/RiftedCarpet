@@ -5,6 +5,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Any field in this class annotated with this class is interpreted as a carpet rule.
+ * The field must be static and have a type of one of:
+ * - boolean
+ * - int
+ * - double
+ * - String
+ * - a subclass of Enum
+ * The default value of the rule will be the initial value of the field.
+ */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Rule
@@ -41,6 +51,14 @@ public @interface Rule
      * For enums, its always strict, same for booleans - no need to set that for them.
      */
     boolean strict() default true;
+
+    /**
+     * If specified, the rule will automatically enable or disable
+     * a builtin Scarpet Rule App with this name.
+     * Consider telling the rule name so users can edit globals
+     * (in case there are relevant globals to edit ofc)
+     */
+    String appSource() default "";
 
     /**
      * The class of the validator checked when the rule is changed.

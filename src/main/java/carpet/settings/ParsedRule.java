@@ -4,14 +4,12 @@ import carpet.CarpetServer;
 import carpet.utils.Messenger;
 import carpet.utils.Translations;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Sets;
 import net.minecraft.command.CommandSource;
 
 import java.lang.reflect.Field;
-import java.util.List;
+import java.util.*;
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Locale;
 
 import static carpet.utils.Translations.tr;
 
@@ -19,6 +17,7 @@ public final class ParsedRule<T> implements Comparable<ParsedRule> {
     public final Field field;
     public final String name;
     public final String description;
+    public final String scarpetApp;
     public final ImmutableList<String> extraInfo;
     public final ImmutableList<String> categories;
     public final ImmutableList<String> options;
@@ -28,8 +27,11 @@ public final class ParsedRule<T> implements Comparable<ParsedRule> {
     public final List<Validator<T>> validators;
     public final T defaultValue;
     public final String defaultAsString;
+    public final SettingsManager settingsManager;
+    private static final Set<Class<?>> NUMBER_CLASSES = Sets.newHashSet(byte.class, short.class, int.class, long.class, float.class, double.class);
 
-    ParsedRule(Field field, Rule rule){
+    ParsedRule(Field field, Rule rule, SettingsManager settingsManager)
+    {
         this.field = field;
         this.name = rule.name().isEmpty() ? field.getName() : rule.name();
         this.type = (Class<T>) field.getType();
@@ -37,10 +39,11 @@ public final class ParsedRule<T> implements Comparable<ParsedRule> {
         this.isStrict = rule.strict();
         this.extraInfo = ImmutableList.copyOf(rule.extra());
         this.categories = ImmutableList.copyOf(rule.category());
+        this.scarpetApp = rule.appSource();
+        this.settingsManager = settingsManager;
         this.validators = new ArrayList<>();
         for (Class v : rule.validate())
             this.validators.add((Validator<T>) callConstructor(v));
-
         if (categories.contains(RuleCategory.COMMAND))
         {
             this.validators.add(callConstructor(Validator._COMMAND.class));
@@ -50,21 +53,27 @@ public final class ParsedRule<T> implements Comparable<ParsedRule> {
                 this.validators.add((Validator<T>) callConstructor(Validator._COMMAND_LEVEL_VALIDATOR.class));
             }
         }
+        if (!scarpetApp.isEmpty())
+        {
+            this.validators.add((Validator<T>) callConstructor(Validator._SCARPET.class));
+        }
         this.isClient = categories.contains(RuleCategory.CLIENT);
         if (this.isClient)
         {
             this.validators.add(callConstructor(Validator._CLIENT.class));
         }
-
         this.defaultValue = get();
         this.defaultAsString = convertToString(this.defaultValue);
         if (rule.options().length > 0)
         {
             this.options = ImmutableList.copyOf(rule.options());
         }
-        else if (this.type == boolean.class || (this.type == String.class && categories.contains(RuleCategory.COMMAND)))
+        else if (this.type == boolean.class){
+            this.options = ImmutableList.of("true","false");
+        }
+        else if(this.type == String.class && categories.contains(RuleCategory.COMMAND))
         {
-            this.options = ImmutableList.of("true", "false");
+            this.options = ImmutableList.of("true", "false", "ops");
         }
         else if (this.type.isEnum())
         {
@@ -87,9 +96,23 @@ public final class ParsedRule<T> implements Comparable<ParsedRule> {
         }
     }
 
+    private <T> T callConstructor(Class<T> cls)
+    {
+        try
+        {
+            Constructor<T> constr = cls.getDeclaredConstructor();
+            constr.setAccessible(true);
+            return constr.newInstance();
+        }
+        catch (ReflectiveOperationException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
     public ParsedRule<T> set(CommandSource source, String value)
     {
-        if (CarpetServer.settingsManager != null && CarpetServer.settingsManager.locked)
+        if (settingsManager != null && settingsManager.locked)
             return null;
         if (type == String.class)
         {
@@ -140,7 +163,7 @@ public final class ParsedRule<T> implements Comparable<ParsedRule> {
             if (!value.equals(get()) || source == null)
             {
                 this.field.set(null, value);
-                if (source != null) CarpetServer.settingsManager.notifyRuleChanged(source, this, stringValue);
+                if (source != null) settingsManager.notifyRuleChanged(source, this, stringValue);
             }
         }
         catch (IllegalAccessException e)
@@ -151,20 +174,9 @@ public final class ParsedRule<T> implements Comparable<ParsedRule> {
         return this;
     }
 
-    private <T> T callConstructor(Class<T> cls)
-    {
-        try
-        {
-            Constructor<T> constr = cls.getDeclaredConstructor();
-            constr.setAccessible(true);
-            return constr.newInstance();
-        }
-        catch (ReflectiveOperationException e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
-
+    /**
+     * @return The value of this {@link ParsedRule}, in its type
+     */
     public T get()
     {
         try
@@ -177,15 +189,47 @@ public final class ParsedRule<T> implements Comparable<ParsedRule> {
         }
     }
 
+    /**
+     * @return The value of this {@link ParsedRule}, as a {@link String}
+     */
+    public String getAsString()
+    {
+        return convertToString(get());
+    }
+
+    /**
+     * @return The value of this {@link ParsedRule}, converted to a {@link boolean}.
+     *         It will only return {@link true} if it's a true {@link boolean} or
+     *         a number greater than zero.
+     */
+    public boolean getBoolValue()
+    {
+        if (type == boolean.class) return (Boolean) get();
+        if (NUMBER_CLASSES.contains(type)) return ((Number) get()).doubleValue() > 0;
+        return false;
+    }
+
+    /**
+     * @return Wether or not this {@link ParsedRule} is in its default value
+     */
+    public boolean isDefault()
+    {
+        return defaultValue.equals(get());
+    }
+
+    /**
+     * Resets this rule to its default value
+     */
+    public void resetToDefault(CommandSource source)
+    {
+        set(source, defaultValue, defaultAsString);
+    }
+
+
     private static String convertToString(Object value)
     {
         if (value instanceof Enum) return ((Enum) value).name().toLowerCase(Locale.ROOT);
         return value.toString();
-    }
-
-    public void resetToDefault(CommandSource source)
-    {
-        set(source, defaultValue, defaultAsString);
     }
 
     @Override
@@ -212,47 +256,44 @@ public final class ParsedRule<T> implements Comparable<ParsedRule> {
         return this.name + ": " + getAsString();
     }
 
-    public String getAsString()
-    {
-        return convertToString(get());
-    }
-
-    public String translatedName(){
-        String key = translationKey();
-        return Translations.hasTranslation(key) ? tr(key) + String.format(" (%s)", name): name;
-    }
-
     private String translationKey()
     {
         return String.format("rule.%s.name", name);
     }
 
+    /**
+     * @return A {@link String} being the translated {@link ParsedRule#name} of this rule,
+     *                          in Carpet's configured language.
+     */
+    public String translatedName(){
+        String key = translationKey();
+        return Translations.hasTranslation(key) ? tr(key) + String.format(" (%s)", name): name;
+    }
+
+    /**
+     * @return A {@link String} being the translated {@link ParsedRule#description} of this rule,
+     *                          in Carpet's configured language.
+     */
     public String translatedDescription()
     {
         return tr(String.format("rule.%s.desc", (name)), description);
     }
 
-    public boolean isDefault()
-    {
-        return defaultValue.equals(get());
-    }
-
+    /**
+     * @return A {@link String} being the translated {@link ParsedRule#extraInfo} of this
+     * 	                        {@link ParsedRule}, in Carpet's configured language.
+     */
     public List<String> translatedExtras()
     {
         if (!Translations.hasTranslations()) return extraInfo;
         String keyBase = String.format("rule.%s.extra.", name);
         List<String> extras = new ArrayList<>();
         int i = 0;
-        while (Translations.hasTranslation(keyBase+i)){
+        while (Translations.hasTranslation(keyBase+i))
+        {
             extras.add(Translations.tr(keyBase+i));
             i++;
         }
         return (extras.isEmpty()) ? extraInfo : extras;
-    }
-
-    public boolean getBoolValue(){
-        if (type == boolean.class) return (Boolean) get();
-        if (type.isAssignableFrom(Number.class)) return ((Number) get()).doubleValue() > 0;
-        return false;
     }
 }
