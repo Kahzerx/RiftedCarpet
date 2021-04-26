@@ -1,9 +1,9 @@
 
 buildscript {
     repositories {
+        maven { url "$projectDir/rift_libs" }
         jcenter()
         maven { url 'http://files.minecraftforge.net/maven' }
-        maven { url "$projectDir/rift_libs" }
         maven { url 'http://repo.spongepowered.org/maven' }
     }
 
@@ -25,9 +25,9 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 repositories {
+    maven { url "$projectDir/rift_libs" }
     mavenCentral()
     maven { url 'https://repo.spongepowered.org/maven/' }
-    maven { url "$projectDir/rift_libs" }
 }
 
 dependencies {
